@@ -6,10 +6,39 @@
     android:layout_height="match_parent"
     tools:context="com.example.meenukochar.mond.SetupAcitivty">
 
-    <TextView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <ImageButton
+        android:id="@+id/setupImgBtn"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:paddingTop="20dp"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/c245339439045212"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="126dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout_editor_absoluteX="30dp"
+        tools:layout_editor_absoluteY="142dp"
+        android:id="@+id/setupNameField"
+        tools:ignore="MissingConstraints"
+        android:hint="Display Name..."/>
+
+    <Button
+        android:id="@+id/submitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="This is THE SETUP ACTIVITY"
-        android:textSize="40dp"/>
+        tools:layout_editor_absoluteX="148dp"
+        tools:layout_editor_absoluteY="447dp"
+        tools:ignore="MissingConstraints"
+        android:text="FINISH SETUP"/>
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
