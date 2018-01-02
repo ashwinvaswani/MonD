@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btn;
 
     boolean status = false;
+    private Button jj;
 
 
     @Override
