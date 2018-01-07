@@ -2,10 +2,10 @@ package com.example.meenukochar.mond;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -14,13 +14,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -60,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
-
+        mDatabaseUsers.keepSynced(true);
 
 
         mGoogleBtn = (SignInButton) findViewById(R.id.GoogleBtn);
@@ -99,9 +97,9 @@ public class LoginActivity extends AppCompatActivity {
         newAccountbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent setupIntent = new Intent(LoginActivity.this, Register_Activity.class);
-                setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(setupIntent);
+                Intent registerIntent = new Intent(LoginActivity.this, Register_Activity.class);
+                registerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(registerIntent);
             }
         });
 
@@ -182,6 +180,7 @@ public class LoginActivity extends AppCompatActivity {
             }
             else{
                 mProgress.dismiss();
+                Log.e(LoginActivity.class.getSimpleName(), result.getStatus().toString());
                 Toast.makeText(LoginActivity.this, "Failed!", Toast.LENGTH_LONG).show();
 
             }
@@ -204,7 +203,10 @@ public class LoginActivity extends AppCompatActivity {
                         }
                         else {
                             mProgress.dismiss();
-                            CheckUserExist();
+                            setupUserDataAndFinish(mAuth.getCurrentUser());
+                            Intent setupIntent = new Intent(LoginActivity.this, SetupAcitivty.class);
+                            setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(setupIntent);
                         }
                     }
                 });
@@ -236,6 +238,19 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void setupUserDataAndFinish(@NonNull final FirebaseUser user) {
+        Uri photoUri = user.getPhotoUrl();
+        String photoUrl;
+        String defaultPhotoUrl = "https://firebasestorage.googleapis.com/v0/b/zconnect-89fbd.appspot.com/o/PhonebookImage%2FdefaultprofilePhone.png?alt=media&token=5f814762-16dc-4dfb-ba7d-bcff0de7a336";
+        if (photoUri != null) photoUrl = photoUri.toString();
+        else photoUrl = defaultPhotoUrl;
+        DatabaseReference currentUserDbRef = mDatabaseUsers.child(user.getUid());
+        currentUserDbRef.child("Image").setValue(photoUrl);
+        currentUserDbRef.child("Username").setValue(user.getDisplayName());
+        currentUserDbRef.child("Email").setValue(user.getEmail());
+        finish(); /*Make Sure HomeActivity exists*/
     }
     //@Override
     //protected void onStart() {

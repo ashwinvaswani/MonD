@@ -3,9 +3,10 @@ package com.example.meenukochar.mond;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,13 +39,15 @@ public class SetupAcitivty extends AppCompatActivity {
 
     private ProgressDialog mProgress;
 
+    private String name;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup_acitivty);
 
         mSetupImgBtn = (ImageButton) findViewById(R.id.setupImgBtn);
-        mNameField = (EditText) findViewById(R.id.nameField);
+        mNameField = (EditText) findViewById(R.id.setupNameField);
         mSubmitBtn = (Button) findViewById(R.id.submitButton);
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         mAuth = FirebaseAuth.getInstance();
@@ -77,7 +80,7 @@ public class SetupAcitivty extends AppCompatActivity {
 
     private void startSetupAccount() {
 
-        final String name = mNameField.getText().toString().trim();
+        name = mNameField.getText().toString().trim();
         final String user_id = mAuth.getCurrentUser().getUid();
 
         if(!TextUtils.isEmpty(name) && mImageUri != null){
@@ -89,6 +92,7 @@ public class SetupAcitivty extends AppCompatActivity {
             filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Log.w("onSuccess","Entered");
 
                     String downloadUri = taskSnapshot.getDownloadUrl().toString();
 
