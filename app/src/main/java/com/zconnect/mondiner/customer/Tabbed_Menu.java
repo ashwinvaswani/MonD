@@ -1,4 +1,4 @@
-package com.example.meenukochar.mond;
+package com.zconnect.mondiner.customer;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -18,7 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.meenukochar.mond.utils.Details;
+import com.zconnect.mondiner.customer.utils.Details;
 
 public class Tabbed_Menu extends AppCompatActivity {
 
@@ -78,7 +78,7 @@ public class Tabbed_Menu extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_tabbed__menu, menu);
+//        getMenuInflater().inflate(R.menu.menu_tabbed__menu, menu);
         return true;
     }
 
@@ -90,9 +90,9 @@ public class Tabbed_Menu extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -145,19 +145,6 @@ public class Tabbed_Menu extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-                case 0:
-
-                    Indian_tab tab1 = new Indian_tab();
-                    return tab1;
-                case 1:
-                    Chinese_tab tab2 = new Chinese_tab();
-                    return tab2;
-               case 3:
-                    Continental_tab tab3 = new Continental_tab();
-                    return tab3;
-                case 2:
-                    Beverages_tab tab4 = new Beverages_tab();
-                    return tab4;
 
                 default:
                     return null;

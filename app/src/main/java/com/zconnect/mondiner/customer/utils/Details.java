@@ -1,4 +1,4 @@
-package com.example.meenukochar.mond.utils;
+package com.zconnect.mondiner.customer.utils;
 
 /**
  * Created by Ishaan on 11-01-2018.

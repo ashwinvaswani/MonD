@@ -1,4 +1,4 @@
-package com.example.meenukochar.mond;
+package com.zconnect.mondiner.customer;
 
 import android.content.Intent;
 import android.os.Bundle;

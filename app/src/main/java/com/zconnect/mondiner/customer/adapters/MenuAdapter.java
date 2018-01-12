@@ -1,4 +1,4 @@
-package com.example.meenukochar.mond.adapters;
+package com.zconnect.mondiner.customer.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -6,9 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.meenukochar.mond.R;
-import com.example.meenukochar.mond.models.Menu;
-import com.example.meenukochar.mond.viewholders.IndianViewholder;
+import com.zconnect.mondiner.customer.R;
+import com.zconnect.mondiner.customer.models.Menu;
+import com.zconnect.mondiner.customer.viewholders.IndianViewholder;
 
 /**
  * Created by Ishaan on 11-01-2018.
