@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.meenukochar.mond">
+    package="com.zconnect.mondiner.customer">
 
     <application
         android:allowBackup="true"
@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:screenOrientation="portrait">
-        <activity android:name=".MainActivity"
+        <activity android:name="com.zconnect.mondiner.customer.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,9 +20,9 @@
         </activity>
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".Register_Activity" />
-        <activity android:name=".SetupAcitivty"></activity>
+        <activity android:name="com.zconnect.mondiner.customer.LoginActivity" />
+        <activity android:name="com.zconnect.mondiner.customer.Register_Activity" />
+        <activity android:name="com.zconnect.mondiner.customer.SetupAcitivty"></activity>
     </application>
 
 </manifest>

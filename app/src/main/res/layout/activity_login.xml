@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/layout_signin"
-    tools:context="com.example.meenukochar.mond.LoginActivity">
+    tools:context="com.zconnect.mondiner.customer.LoginActivity">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

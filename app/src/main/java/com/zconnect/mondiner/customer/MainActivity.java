@@ -1,6 +1,5 @@
-package com.example.meenukochar.mond;
+package com.zconnect.mondiner.customer;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
