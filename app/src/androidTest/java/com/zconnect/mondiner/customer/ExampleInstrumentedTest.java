@@ -1,4 +1,4 @@
-package com.example.meenukochar.mond;
+package com.zconnect.mondiner.customer;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.meenukochar.mond", appContext.getPackageName());
+        assertEquals("com.example.meenukochar.com.zconnect.mondiner.customer", appContext.getPackageName());
     }
 }

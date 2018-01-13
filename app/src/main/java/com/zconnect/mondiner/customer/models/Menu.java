@@ -1,4 +1,4 @@
-package com.example.meenukochar.mond.models;
+package com.zconnect.mondiner.customer.models;
 
 /**
  * Created by Ishaan on 11-01-2018.

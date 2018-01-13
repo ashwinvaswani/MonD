@@ -1,10 +1,10 @@
-package com.example.meenukochar.mond.viewholders;
+package com.zconnect.mondiner.customer.viewholders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+import com.zconnect.mondiner.customer.R;
 
-import com.example.meenukochar.mond.R;
 
 /**
  * Created by Ishaan on 11-01-2018.

@@ -1,43 +1,35 @@
 {
   "project_info": {
-    "project_number": "1029233289443",
-    "firebase_url": "https://mond-2c1c6.firebaseio.com",
-    "project_id": "mond-2c1c6",
-    "storage_bucket": "mond-2c1c6.appspot.com"
+    "project_number": "574344724846",
+    "firebase_url": "https://mondiner-956fa.firebaseio.com",
+    "project_id": "mondiner-956fa",
+    "storage_bucket": "mondiner-956fa.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1029233289443:android:bb5a042eb6ab0719",
+        "mobilesdk_app_id": "1:574344724846:android:905c2ceafb6a1b68",
         "android_client_info": {
-          "package_name": "com.example.meenukochar.mond"
+          "package_name": "com.example.agarw.mondinermanager_android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1029233289443-skr9b9qla6pdn93n0b2thukk5k5pdk3h.apps.googleusercontent.com",
+          "client_id": "574344724846-fh64b7uh2pnf1i6g873jbnbv87a9qpcs.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.meenukochar.mond",
-            "certificate_hash": "854a45aa14778d7040f78bfedafdb2c209857a6a"
+            "package_name": "com.example.agarw.mondinermanager_android",
+            "certificate_hash": "a9bde7d8422265b69b0d59f3fbad39086e008a7f"
           }
         },
         {
-          "client_id": "1029233289443-o9d3hok4mtvdt0225h8dk9dsqgs3p074.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.meenukochar.mond",
-            "certificate_hash": "3e3da0603ee9d2632c9586520ba6e40149c0b6af"
-          }
-        },
-        {
-          "client_id": "1029233289443-idlaaqmp8kqii7phnpa500hip2fb9enc.apps.googleusercontent.com",
+          "client_id": "574344724846-3l9faspngufmu136m87m76u5jt1mbipd.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB0m-PibEgpCCowTnCfVoNMBY3qbHrs_VI"
+          "current_key": "AIzaSyAbNgQtTUeU5H2HSUC5rQW103z8ubLANN4"
         }
       ],
       "services": {
@@ -48,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "1029233289443-idlaaqmp8kqii7phnpa500hip2fb9enc.apps.googleusercontent.com",
+              "client_id": "574344724846-3l9faspngufmu136m87m76u5jt1mbipd.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
@@ -60,28 +52,28 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1029233289443:android:ed307ab0f1b27c0e",
+        "mobilesdk_app_id": "1:574344724846:android:ddc0aa8d5df840aa",
         "android_client_info": {
-          "package_name": "com.example.ishaan.mond_owner"
+          "package_name": "com.zconnect.mondiner.customer"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1029233289443-9tfp1h712oq6ss4dkmlo4uuq7jipp0ku.apps.googleusercontent.com",
+          "client_id": "574344724846-3v5tugpr5lr23nlum45v9p9qi4bb180m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.ishaan.mond_owner",
-            "certificate_hash": "854a45aa14778d7040f78bfedafdb2c209857a6a"
+            "package_name": "com.zconnect.mondiner.customer",
+            "certificate_hash": "9bd8fd8347cd2021778be4a046f7683a1bbe9781"
           }
         },
         {
-          "client_id": "1029233289443-idlaaqmp8kqii7phnpa500hip2fb9enc.apps.googleusercontent.com",
+          "client_id": "574344724846-3l9faspngufmu136m87m76u5jt1mbipd.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB0m-PibEgpCCowTnCfVoNMBY3qbHrs_VI"
+          "current_key": "AIzaSyAbNgQtTUeU5H2HSUC5rQW103z8ubLANN4"
         }
       ],
       "services": {
@@ -92,7 +84,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "1029233289443-idlaaqmp8kqii7phnpa500hip2fb9enc.apps.googleusercontent.com",
+              "client_id": "574344724846-3l9faspngufmu136m87m76u5jt1mbipd.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
