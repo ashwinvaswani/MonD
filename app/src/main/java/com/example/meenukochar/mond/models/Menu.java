@@ -8,6 +8,7 @@ package com.example.meenukochar.mond.models;
 public class Menu {
 
     private String itemName;
+    private String itemCuisine;
     private double itemPrice;
     private int vegNonVeg;
     private boolean availability;
@@ -17,12 +18,25 @@ public class Menu {
 
     }
 
+    public Menu(String itemCuisine) {
+        this.itemCuisine = itemCuisine;
+    }
+
+    public String getItemCuisine() {
+        return itemCuisine;
+    }
+
+    public void setItemCuisine(String itemCuisine) {
+        this.itemCuisine = itemCuisine;
+    }
+
     public Menu(String itemName, double itemPrice, int vegNonVeg, boolean availability, int itemQuantity) {
         this.itemName = itemName;
         this.itemPrice = itemPrice;
         this.vegNonVeg = vegNonVeg;
         this.availability = availability;
         this.itemQuantity = itemQuantity;
+
     }
 
     public String getItemName() {

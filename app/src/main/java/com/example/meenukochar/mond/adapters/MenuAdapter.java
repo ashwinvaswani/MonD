@@ -10,15 +10,17 @@ import com.example.meenukochar.mond.R;
 import com.example.meenukochar.mond.models.Menu;
 import com.example.meenukochar.mond.viewholders.IndianViewholder;
 
+import java.util.ArrayList;
+
 /**
  * Created by Ishaan on 11-01-2018.
  */
 
 public class MenuAdapter extends RecyclerView.Adapter<IndianViewholder> {
 
-    Menu[] menus;
+    ArrayList<Menu> menus;
 
-    public MenuAdapter(Menu[] menuArray) {
+    public MenuAdapter(ArrayList<Menu> menuArray) {
 
         menus=menuArray;
 
@@ -36,16 +38,16 @@ public class MenuAdapter extends RecyclerView.Adapter<IndianViewholder> {
 
     @Override
     public int getItemCount() {
-        return menus.length;
+        return menus.size();
     }
 
     @Override
     public void onBindViewHolder(IndianViewholder holder, int position) {
         Log.e("uptou","onbind called at"+position);
-        holder.itemNametv.setText(menus[position].getItemName());
-        String price = Double.toString(menus[position].getItemPrice());
+        holder.itemNametv.setText(menus.get(position).getItemName());
+        String price = Double.toString(menus.get(position).getItemPrice());
         holder.itemPricetv.setText(price);
-        if(menus[position].getVegNonVeg()==1){
+        if(menus.get(position).getVegNonVeg()==1){
             holder.itemVegtv.setText("Veg");
         }
         else{

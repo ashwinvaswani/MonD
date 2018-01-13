@@ -5,6 +5,7 @@ package com.example.meenukochar.mond.utils;
  */
 
 public class Details {
+//Storing restaurantID, userID, userName for later uses...
 
     public static  String REST_ID = "";
 
