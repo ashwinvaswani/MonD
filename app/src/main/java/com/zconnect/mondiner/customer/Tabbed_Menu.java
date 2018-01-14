@@ -1,5 +1,6 @@
 package com.zconnect.mondiner.customer;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,6 +21,9 @@ import android.widget.TextView;
 
 import com.zconnect.mondiner.customer.utils.Details;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Tabbed_Menu extends AppCompatActivity {
 
     /**
@@ -30,7 +34,7 @@ public class Tabbed_Menu extends AppCompatActivity {
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    //private SectionsPagerAdapter mSectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -52,15 +56,19 @@ public class Tabbed_Menu extends AppCompatActivity {
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        //mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         tabLayout=findViewById(R.id.tabs);
-
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager =findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        setupViewPager(mViewPager);
+      //  mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        tabLayout.setupWithViewPager(mViewPager);
         tabLayout.setupWithViewPager(mViewPager);
         //fab
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -72,6 +80,23 @@ public class Tabbed_Menu extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void setupViewPager(ViewPager mViewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        int count = 10;
+        for (int i=0; i<count; i++){
+
+            Indian_tab fView = new Indian_tab();
+            View view = fView.getView();
+
+
+            adapter.addFrag(fView,"TAB " + i);
+        }
+
+        mViewPager.setAdapter(adapter);
     }
 
 
@@ -132,11 +157,39 @@ public class Tabbed_Menu extends AppCompatActivity {
         }
     }
 
+    class ViewPagerAdapter extends FragmentPagerAdapter{
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);}
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFrag(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    /*public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -170,7 +223,7 @@ public class Tabbed_Menu extends AppCompatActivity {
                 case 3:
                     return "Continental";
             }
-            return null;
+                return null;
         }
-    }
+    }*/
 }
