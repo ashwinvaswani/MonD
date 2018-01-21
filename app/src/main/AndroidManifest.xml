@@ -3,17 +3,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.zconnect.mondiner.customer">
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:screenOrientation="portrait"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:screenOrientation="portrait">
-
+        android:theme="@style/AppTheme">
         <activity
-            android:name="com.zconnect.mondiner.customer.MainActivity"
+            android:name=".UnusedMainActivity"
             android:screenOrientation="userPortrait"
             tools:replace="screenOrientation">
             <intent-filter>
@@ -28,7 +35,6 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".Register_Activity" />
         <activity android:name=".SetupAcitivty" />
-
         <activity
             android:name=".QR_Offers_prevOrders"
             android:label="@string/title_activity_bottom_nav" />
@@ -36,6 +42,7 @@
             android:name=".Tabbed_Menu"
             android:label="@string/title_activity_tabbed__menu"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".CartActivity"></activity>
     </application>
 
 </manifest>

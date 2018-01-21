@@ -2,7 +2,7 @@ package com.zconnect.mondiner.customer;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +25,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,12 +42,15 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "Login_Activity";
     private ProgressDialog mProgress;
 
-
+    public SharedPreferences sh_Pref;
+    SharedPreferences.Editor toEdit;
 
     private EditText mEmailField;
     private EditText mPasswordField;
     private Button mSignInBtn;
     private DatabaseReference mDatabaseUsers;
+
+    private String user_id = "";
 
 
     @Override
@@ -94,14 +96,14 @@ public class LoginActivity extends AppCompatActivity {
 
         newAccountbtn = (Button) findViewById(R.id.newAccount);
 
-        newAccountbtn.setOnClickListener(new View.OnClickListener() {
+        /*newAccountbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent registerIntent = new Intent(LoginActivity.this, Register_Activity.class);
                 registerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(registerIntent);
             }
-        });
+        });*/
 
 
         mGoogleBtn.setOnClickListener(new View.OnClickListener() {
@@ -110,7 +112,14 @@ public class LoginActivity extends AppCompatActivity {
                 signIn();
             }
         });
+
+        /*SharedPreferences prefs = this.getSharedPreferences(
+                "com.zconnect.mondiner.customer", Context.MODE_PRIVATE);
+
+        prefs.edit().putString(userid, user_id);
+*/
     }
+
 
     private void checkLogin() {
 
@@ -127,7 +136,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                    if(task.isSuccessful()){
                        mProgress.dismiss();
-                       checkUserExist();
+                       CheckUserExist();
                    }
                    else{
                        mProgress.dismiss();
@@ -137,27 +146,6 @@ public class LoginActivity extends AppCompatActivity {
             });
         }
 
-    }
-
-    private void checkUserExist() {
-        final String user_id = mAuth.getCurrentUser().getUid();
-        mDatabaseUsers.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.hasChild(user_id)){
-                    Intent tomain = new Intent(LoginActivity.this, MainActivity.class);
-                    tomain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(tomain);
-                } else{
-                    Toast.makeText(LoginActivity.this, "You need to setup your account!", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     private void signIn() {
@@ -174,7 +162,6 @@ public class LoginActivity extends AppCompatActivity {
             mProgress.setMessage("Starting Sign In...");
             mProgress.show();
             if(result.isSuccess()){
-
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
             }
@@ -182,14 +169,13 @@ public class LoginActivity extends AppCompatActivity {
                 mProgress.dismiss();
                 Log.e(LoginActivity.class.getSimpleName(), result.getStatus().toString());
                 Toast.makeText(LoginActivity.this, "Failed!", Toast.LENGTH_LONG).show();
-
             }
         }
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
-
+        //TODO : Put the value of USER_ID in Details class;
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -203,10 +189,10 @@ public class LoginActivity extends AppCompatActivity {
                         }
                         else {
                             mProgress.dismiss();
-                            setupUserDataAndFinish(mAuth.getCurrentUser());
-                            Intent setupIntent = new Intent(LoginActivity.this, SetupAcitivty.class);
+                            CheckUserExist();
+                            /*Intent setupIntent = new Intent(LoginActivity.this, SetupAcitivty.class);
                             setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(setupIntent);
+                            startActivity(setupIntent);*/
                         }
                     }
                 });
@@ -216,16 +202,22 @@ public class LoginActivity extends AppCompatActivity {
 
     private void CheckUserExist() {
         if(mAuth.getCurrentUser() != null){
-            final String user_id = mAuth.getCurrentUser().getUid();
+            user_id = mAuth.getCurrentUser().getUid();
             mDatabaseUsers.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.hasChild(user_id)){
-                        Intent setupIntent = new Intent(LoginActivity.this, MainActivity.class);
+                        /*Details.USER_ID = user_id;
+                        Log.e("LoginActivity","user_id : " + user_id+" USER_ID (Details) : "+Details.USER_ID);
+                        sharedPreferences();*/
+                        Intent setupIntent = new Intent(LoginActivity.this, QR_Offers_prevOrders.class);
                         setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(setupIntent);
                     }
                     else{
+//                        setupUserDataAndFinish(mAuth.getCurrentUser());
+                        /*Details.USER_ID = user_id;
+                        sharedPreferences();*/
                         Intent setupIntent = new Intent(LoginActivity.this, SetupAcitivty.class);
                         setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(setupIntent);
@@ -239,19 +231,34 @@ public class LoginActivity extends AppCompatActivity {
             });
         }
     }
+//TODO : Remove the onStart intent jump
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        Intent tomenu = new Intent(LoginActivity.this, Tabbed_Menu.class);
+//        tomenu.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        startActivity(tomenu);
+//    }
 
-    private void setupUserDataAndFinish(@NonNull final FirebaseUser user) {
-        Uri photoUri = user.getPhotoUrl();
-        String photoUrl;
-        String defaultPhotoUrl = "https://firebasestorage.googleapis.com/v0/b/zconnect-89fbd.appspot.com/o/PhonebookImage%2FdefaultprofilePhone.png?alt=media&token=5f814762-16dc-4dfb-ba7d-bcff0de7a336";
-        if (photoUri != null) photoUrl = photoUri.toString();
-        else photoUrl = defaultPhotoUrl;
-        DatabaseReference currentUserDbRef = mDatabaseUsers.child(user.getUid());
-        currentUserDbRef.child("Image").setValue(photoUrl);
-        currentUserDbRef.child("Username").setValue(user.getDisplayName());
-        currentUserDbRef.child("Email").setValue(user.getEmail());
-        finish(); /*Make Sure HomeActivity exists*/
-    }
+    //
+//    private void setupUserDataAndFinish(@NonNull final FirebaseUser user) {
+//        Uri photoUri = user.getPhotoUrl();
+//        String photoUrl;
+//        String defaultPhotoUrl = "https://firebasestorage.googleapis.com/v0/b/zconnect-89fbd.appspot.com/o/PhonebookImage%2FdefaultprofilePhone.png?alt=media&token=5f814762-16dc-4dfb-ba7d-bcff0de7a336";
+//        if (photoUri != null) photoUrl = photoUri.toString();
+//        else photoUrl = defaultPhotoUrl;
+//        DatabaseReference currentUserDbRef = mDatabaseUsers.child(user.getUid());
+//        currentUserDbRef.child("Image").setValue(photoUrl);
+//        currentUserDbRef.child("Username").setValue(user.getDisplayName());
+//        currentUserDbRef.child("Email").setValue(user.getEmail());
+//        finish(); /*Make Sure HomeActivity exists*/
+//    }
+    /*public void sharedPreferences(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("UserID",Details.USER_ID);
+        editor.apply();
+    }*/
     //@Override
     //protected void onStart() {
       //  super.onStart();

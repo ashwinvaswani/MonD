@@ -1,11 +1,10 @@
 apply plugin: 'com.android.application'
-
 android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.zconnect.mondiner.customer"
         minSdkVersion 22
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -37,6 +36,7 @@ dependencies {
     compile 'com.google.firebase:firebase-storage:11.8.0'
     compile 'com.journeyapps:zxing-android-embedded:3.5.0'
     compile 'com.firebase:firebase-client-android:2.5.0'
+    compile 'com.cepheuen.elegant-number-button:lib:1.0.2'
 }
 apply plugin: 'com.google.gms.google-services'
 

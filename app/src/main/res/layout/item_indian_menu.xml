@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -30,10 +31,42 @@
         android:text="Veg"
         android:layout_weight="1"
         />
-    <ToggleButton
-        android:id="@+id/item_add_indian_toggle"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:text="Add"/>
+    <FrameLayout
+        android:id="@+id/frame_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+       <!-- <Button
+            android:id="@+id/add_btn_frame"
+            android:layout_widt h="100dp"
+            android:layout_height="wrap_content"
+            android:text="Add"/>-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/decrement_button"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="-" />
+
+            <TextView
+                android:id="@+id/quantity_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="0"
+                />
+
+            <Button
+                android:id="@+id/increment_button"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="+" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 </LinearLayout>

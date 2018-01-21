@@ -9,10 +9,10 @@ public class Menu {
 
     private String itemName;
     private String itemCuisine;
-    private double itemPrice;
-    private int vegNonVeg;
+    private String itemPrice;
+    private String vegNonVeg;
     private boolean availability;
-    private int itemQuantity;
+    private String  itemQuantity;
 
     public Menu(){
 
@@ -30,13 +30,12 @@ public class Menu {
         this.itemCuisine = itemCuisine;
     }
 
-    public Menu(String itemName, double itemPrice, int vegNonVeg, boolean availability, int itemQuantity) {
+    public Menu(String itemName, String itemPrice, String vegNonVeg, boolean availability, String itemQuantity) {
         this.itemName = itemName;
         this.itemPrice = itemPrice;
         this.vegNonVeg = vegNonVeg;
         this.availability = availability;
         this.itemQuantity = itemQuantity;
-
     }
 
     public String getItemName() {
@@ -47,19 +46,19 @@ public class Menu {
         this.itemName = itemName;
     }
 
-    public double getItemPrice() {
+    public String getItemPrice() {
         return itemPrice;
     }
 
-    public void setItemPrice(double itemPrice) {
+    public void setItemPrice(String itemPrice) {
         this.itemPrice = itemPrice;
     }
 
-    public int getVegNonVeg() {
+    public String getVegNonVeg() {
         return vegNonVeg;
     }
 
-    public void setVegNonVeg(int vegNonVeg) {
+    public void setVegNonVeg(String vegNonVeg) {
         this.vegNonVeg = vegNonVeg;
     }
 
@@ -71,12 +70,23 @@ public class Menu {
         this.availability = availability;
     }
 
-    public int getItemQuantity() {
-        return itemQuantity;
+    public String getItemQuantity() {
+        if(itemQuantity!=null) {
+            return itemQuantity;
+        }
+        else {
+            return "0";
+        }
     }
 
-    public void setItemQuantity(int itemQuantity) {
+    public void setItemQuantity(String itemQuantity) {
         this.itemQuantity = itemQuantity;
+    }
+
+    public void incrementQuantity() {
+        int qty = Integer.parseInt(itemQuantity);
+        qty++;
+        this.itemQuantity = qty + "";
     }
 }
 

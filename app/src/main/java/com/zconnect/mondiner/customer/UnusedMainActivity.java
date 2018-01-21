@@ -18,7 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.integration.android.IntentIntegrator;
 
 
-public class MainActivity extends AppCompatActivity {
+public class UnusedMainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseUsers;
@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         qrScan = new IntentIntegrator(this);
 
         btn = (Button) findViewById(R.id.fragment_change);
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if(firebaseAuth.getCurrentUser() == null){
 
-                    Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+                    Intent loginIntent = new Intent(UnusedMainActivity.this, LoginActivity.class);
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(loginIntent);
 
@@ -91,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.hasChild(user_id)) {
-                        Intent tomain = new Intent(MainActivity.this, Register_Activity.class);
+                        Intent tomain = new Intent(UnusedMainActivity.this, Register_Activity.class);
                         tomain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(tomain);
                     }
@@ -113,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth.addAuthStateListener(mAuthListener);
        // qrScan.initiateScan();
-        Intent bottom_nav = new Intent(MainActivity.this, QR_Offers_prevOrders.class);
+        Intent bottom_nav = new Intent(UnusedMainActivity.this, QR_Offers_prevOrders.class);
         bottom_nav.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(bottom_nav);
     }

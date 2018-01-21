@@ -20,7 +20,8 @@
         android:src="@mipmap/c245339439045212"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="126dp"
-        tools:layout_editor_absoluteY="16dp" />
+        tools:layout_editor_absoluteY="16dp"
+        />
 
     <EditText
         android:layout_width="match_parent"
