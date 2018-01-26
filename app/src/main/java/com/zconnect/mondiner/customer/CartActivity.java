@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -31,22 +32,24 @@ public class CartActivity extends AppCompatActivity {
     private int dishQuantity;
     private String quantity;
     private TextView totalAmount;
+    private int amount =0;
+    private TextView noItemCart;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
         cartContent = findViewById(R.id.cart_recyclerview);
-
+        noItemCart = findViewById(R.id.no_item_cart_text);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         cartContent.setLayoutManager(linearLayoutManager);
 
         totalAmount = findViewById(R.id.total_text);
         mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
-                .child(Details.TABLE_ID).child("currentOrder").child("dishes");
-        mDishRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu")
-                .child("dishes");
+                .child(Details.TABLE_ID).child("currentOrder").child("cart");
+//        mDishRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu")
+//                .child("dishes");
 
 /*        mTableRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -66,17 +69,26 @@ public class CartActivity extends AppCompatActivity {
             }
         });*/
         dishAmount = 0;
-
+        //TODO : Handle null exceptions from firebase
         mTableRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 dishitems.clear();
 
                 for (final DataSnapshot dishid : dataSnapshot.getChildren()) {
-                    final  DishOrdered dishOrdered = new DishOrdered();
-                    dishOrdered.setDishID(dishid.getKey());
+                    final DishOrdered dishOrdered = new DishOrdered();
 
-                    mDishRef.addValueEventListener(new ValueEventListener() {
+                    if (!(Integer.parseInt(dishid.child("quantity").getValue(String.class)) == 0)) {
+                        dishOrdered.setDishID(dishid.getKey());
+                        dishOrdered.setDishName(dishid.child("name").getValue(String.class));
+                        dishOrdered.setDishPrice(dishid.child("price").getValue(String.class));
+                        dishOrdered.setDishQuantity(dishid.child("quantity").getValue(String.class));
+                        dishQuantity = Integer.parseInt(dishid.child("quantity").getValue(String.class));
+                        dishAmount = Integer.parseInt(dishid.child("quantity").getValue(String.class)) * Integer.parseInt(dishid.child("price").getValue(String.class));
+                        dishOrdered.setDishAmount(dishAmount + "");
+                        amount+=dishAmount;
+
+                    /*mDishRef.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             dishOrdered.setDishPrice(dataSnapshot.child(dishid.getKey().toString()).child("price").getValue().toString());
@@ -88,10 +100,9 @@ public class CartActivity extends AppCompatActivity {
                         public void onCancelled(DatabaseError databaseError) {
 
                         }
-                    });
+                    });*/
 
-
-
+/*
                     dishQuantity = 0;
                     int i=0;
                     for(DataSnapshot useridshot : dishid.getChildren()){
@@ -100,14 +111,11 @@ public class CartActivity extends AppCompatActivity {
                         dishQuantity = dishQuantity + Integer.parseInt(quantity);
  //                       i++;
                     }
-
-                    dishOrdered.setDishQuantity(dishQuantity+"");
+*/
                     dishitems.add(dishOrdered);
-//                    dishAmount += Integer.parseInt(dishPrice)*dishQuantity;
 
                 }
-
-
+                }
                 cartAdapter.notifyDataSetChanged();
             }
             @Override
@@ -116,7 +124,10 @@ public class CartActivity extends AppCompatActivity {
             }
         });
 
-        //totalAmount.setText(Integer.toString(dishAmount));
+        totalAmount.setText(amount + "");
+        if(dishitems.size() != 0){
+            noItemCart.setVisibility(View.GONE);
+        }
         cartAdapter = new CartAdapter(dishitems);
         cartContent.setAdapter(cartAdapter);
     }

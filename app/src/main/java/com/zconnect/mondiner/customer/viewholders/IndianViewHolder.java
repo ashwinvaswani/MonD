@@ -39,7 +39,8 @@ public class IndianViewHolder extends RecyclerView.ViewHolder implements View.On
                 .child("table")
                 .child(Details.TABLE_ID)
                 .child("currentOrder")
-                .child("dishes");
+                .child("cart");
+                //.child("dishes");
     }
 
     public void populate(final com.zconnect.mondiner.customer.models.Menu menu, final String dishId) {
@@ -59,20 +60,26 @@ public class IndianViewHolder extends RecyclerView.ViewHolder implements View.On
             case R.id.increment_button: {
                 Log.e("IndianViewHolder" +
                         " ", "in textview" + quantityDisplay.getText().toString());
-
                 int i = Integer.parseInt(menu.getItemQuantity()) + 1;
                 menu.setItemQuantity(i + "");
-                mTableRef.child(dishId).child(Details.USER_ID).child("quantity").setValue(menu.getItemQuantity());
+                mTableRef.child(dishId).child("price").setValue(menu.getItemPrice());
+                mTableRef.child(dishId).child("name").setValue(menu.getItemName());
+                mTableRef.child(dishId).child("users").child(Details.USER_ID).setValue(menu.getItemQuantity());
                 break;
             }
             case R.id.decrement_button: {
-                int i = Integer.parseInt(menu.getItemQuantity()) - 1;
-                if (Integer.parseInt(menu.getItemQuantity()) < 0) {
-                    mTableRef.child(dishId).child(Details.USER_ID).child("quantity").setValue("0");
-                    menu.setItemQuantity("0");
-                } else {
+                if(Integer.parseInt(quantityDisplay.getText().toString())<0){
+                    mTableRef.child(dishId).child("users").child(Details.USER_ID).setValue("0");
+                    quantityDisplay.setText("0");
+                /*if (Integer.parseInt(menu.getItemQuantity()) < 0) {
+                    mTableRef.child(dishId).child("users").child(Details.USER_ID).setValue("0");
+                    menu.setItemQuantity("0");*/
+                }
+                else {
+                    int i = Integer.parseInt(menu.getItemQuantity()) - 1;
                     mTableRef.child(dishId).child(Details.USER_ID).child("quantity").setValue(i + "");
                     menu.setItemQuantity(i + "");
+                    mTableRef.child(dishId).child("users").child(Details.USER_ID).setValue(menu.getItemQuantity());
                 }
                 break;
             }

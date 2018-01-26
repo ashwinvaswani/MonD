@@ -38,6 +38,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewholder> {
         holder.itemNametv.setText(dishitems.get(position).getDishName());
         holder.itemQuantitytv.setText(dishitems.get(position).getDishQuantity());
         holder.itemPricetv.setText(dishitems.get(position).getDishPrice());
+        holder.itemAmounttv.setText(dishitems.get(position).getDishAmount());
         //int amount = Integer.parseInt(dishitems.get(position).getDishPrice())*Integer.parseInt(dishitems.get(position).getDishQuantity());
         //holder.itemAmounttv.setText(amount+"");
     }

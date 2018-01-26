@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.google.firebase.database.DataSnapshot;
@@ -48,10 +49,10 @@ public class Tabbed_Menu extends AppCompatActivity {
     private String[] cIdArray;
     private ElegantNumberButton incDec;
     private ArrayList<Tabs> tabsInfo = new ArrayList<>();
-
+    private TextView noItemText;
     TabLayout tabLayout;
     DatabaseReference mMenuRef;
-    private DatabaseReference mMenuDishesRef;
+    private DatabaseReference mTableRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,7 @@ public class Tabbed_Menu extends AppCompatActivity {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         //mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
+        noItemText = findViewById(R.id.no_item_text);
         tabLayout = findViewById(R.id.tabs);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -81,7 +82,8 @@ public class Tabbed_Menu extends AppCompatActivity {
         //TODO : get the REST_ID from the Details class. Right now its hard coded
         //mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child("redChillies");
 
-        mMenuDishesRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("dishes");
+        mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("currentOrder").child("activeUsers").child(Details.USER_ID).child("name");
+        mTableRef.setValue(Details.USERNAME);
 
         //mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child("redChillies").child("info").child("servesCuisine");
         mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("categories");
@@ -277,6 +279,7 @@ public class Tabbed_Menu extends AppCompatActivity {
         public void addFrag(Fragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
+//            noItemText.setText("No" + title + "items to show");
         }
 
         @Override

@@ -9,6 +9,19 @@ public class DishOrdered {
     private String dishID;
     private String dishPrice;
     private String dishQuantity;
+    private String dishAmount;
+
+    public String getDishAmount() {
+        return dishAmount;
+    }
+
+    public void setDishAmount(String dishAmount) {
+        this.dishAmount = dishAmount;
+    }
+
+    public DishOrdered(String dishAmount) {
+        this.dishAmount = dishAmount;
+    }
 
     public DishOrdered(){
 
