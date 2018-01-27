@@ -21,7 +21,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewholder> {
     private ArrayList<DishOrdered> dishitems;
 
 
-    public CartAdapter(ArrayList<DishOrdered> dishArray){
+    public CartAdapter(ArrayList<DishOrdered> dishArray)    {
         dishitems = dishArray;
     }
 

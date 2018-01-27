@@ -7,12 +7,12 @@ package com.zconnect.mondiner.customer.models;
 public class CartUserData {
     private String userName;
     private String userID;
-    private String userQuantity;
+    private String userStatus;
 
     public CartUserData(String userName, String userID, String userQuantity) {
         this.userName = userName;
         this.userID = userID;
-        this.userQuantity = userQuantity;
+        this.userStatus = userQuantity;
     }
 
     public String getUserName() {
@@ -31,12 +31,12 @@ public class CartUserData {
         this.userID = userID;
     }
 
-    public String getUserQuantity() {
-        return userQuantity;
+    public String getUserStatus() {
+        return userStatus;
     }
 
-    public void setUserQuantity(String userQuantity) {
-        this.userQuantity = userQuantity;
+    public void setUserStatus(String userQuantity) {
+        this.userStatus = userQuantity;
     }
 
     public CartUserData(){

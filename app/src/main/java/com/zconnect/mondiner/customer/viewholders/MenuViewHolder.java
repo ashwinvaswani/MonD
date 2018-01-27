@@ -12,7 +12,7 @@ import com.zconnect.mondiner.customer.R;
 import com.zconnect.mondiner.customer.models.Menu;
 import com.zconnect.mondiner.customer.utils.Details;
 
-public class IndianViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     private TextView itemNametv;
     private TextView itemPricetv;
@@ -24,7 +24,7 @@ public class IndianViewHolder extends RecyclerView.ViewHolder implements View.On
     private Menu menu;
     private String dishId;
 
-    public IndianViewHolder(View itemView) {
+    public MenuViewHolder(View itemView) {
         super(itemView);
         itemNametv = itemView.findViewById(R.id.item_name_indian);
         itemPricetv = itemView.findViewById(R.id.item_price_indian);
@@ -58,7 +58,7 @@ public class IndianViewHolder extends RecyclerView.ViewHolder implements View.On
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.increment_button: {
-                Log.e("IndianViewHolder" +
+                Log.e("MenuViewHolder" +
                         " ", "in textview" + quantityDisplay.getText().toString());
                 int i = Integer.parseInt(menu.getItemQuantity()) + 1;
                 menu.setItemQuantity(i + "");

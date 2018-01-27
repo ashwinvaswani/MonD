@@ -42,7 +42,8 @@
             android:name=".Tabbed_Menu"
             android:label="@string/title_activity_tabbed__menu"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".CartActivity"></activity>
+        <activity android:name=".CartActivity" />
+        <activity android:name=".ConfirmationActivity"></activity>
     </application>
 
 </manifest>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:context="com.zconnect.mondiner.customer.ConfirmationActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Order Confirmed"
+            android:gravity="center"
+            android:textColor="#66be30"
+            android:textSize="26dp" />
+        <Button
+            android:id="@+id/call_waiter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CALL WAITER"
+            android:layout_marginTop="20dp"
+            />
+        <Button
+            android:id="@+id/order_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Order Something else?"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your order:"
+            android:textSize="20dp"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/order_confirm_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            >
+        </android.support.v7.widget.RecyclerView>
+        <TextView
+            android:id="@+id/confirm_total_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</ScrollView>

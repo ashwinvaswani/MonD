@@ -82,8 +82,9 @@ public class Tabbed_Menu extends AppCompatActivity {
         //TODO : get the REST_ID from the Details class. Right now its hard coded
         //mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child("redChillies");
 
-        mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("currentOrder").child("activeUsers").child(Details.USER_ID).child("name");
-        mTableRef.setValue(Details.USERNAME);
+        mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("currentOrder").child("activeUsers").child(Details.USER_ID);
+        mTableRef.child("name").setValue(Details.USERNAME);
+        mTableRef.child("confirmStatus").setValue("No");
 
         //mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child("redChillies").child("info").child("servesCuisine");
         mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("categories");
@@ -308,7 +309,7 @@ public class Tabbed_Menu extends AppCompatActivity {
             }
         }
 
-        @Override
+           @Override
         public int getCount() {
             // Show 3 total pages.
             return 4;

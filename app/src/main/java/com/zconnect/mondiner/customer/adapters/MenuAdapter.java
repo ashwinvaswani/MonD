@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import com.zconnect.mondiner.customer.R;
 import com.zconnect.mondiner.customer.models.Menu;
-import com.zconnect.mondiner.customer.viewholders.IndianViewHolder;
+import com.zconnect.mondiner.customer.viewholders.MenuViewHolder;
 
 import java.util.ArrayList;
 
@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * Created by Ishaan.
  */
 
-public class MenuAdapter extends RecyclerView.Adapter<IndianViewHolder> {
+public class MenuAdapter extends RecyclerView.Adapter<MenuViewHolder> {
 
     private ArrayList<Menu> menus;
     private ArrayList<String> dishIDs = new ArrayList<>();
@@ -26,15 +26,15 @@ public class MenuAdapter extends RecyclerView.Adapter<IndianViewHolder> {
     }
 
     @Override
-    public IndianViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MenuViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View newView = layoutInflater.inflate(R.layout.item_indian_menu, parent, false);
-        return new IndianViewHolder(newView);
+        return new MenuViewHolder(newView);
     }
 
 
     @Override
-    public void onBindViewHolder(final IndianViewHolder holder, final int position) {
+    public void onBindViewHolder(final MenuViewHolder holder, final int position) {
         holder.populate(menus.get(position), dishIDs.get(position));
     }
 
