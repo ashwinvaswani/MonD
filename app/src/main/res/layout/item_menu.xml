@@ -2,45 +2,61 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:weightSum="1"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_weight=".2"
+        android:padding="5dp"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:layout_alignParentTop="true"
+            android:scaleType="centerCrop"/>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_weight="3">
+        android:layout_height="wrap_content"
+        android:layout_weight=".8"
+        android:orientation="vertical">
+
         <TextView
             android:id="@+id/item_name_indian"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="24sp"
             android:text="Paneer"
-            />
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:textSize="24sp" />
+
         <TextView
             android:id="@+id/item_price_indian"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
             android:text="200"
-            />
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:textSize="14sp" />
     </LinearLayout>
-    <TextView
-        android:id="@+id/item_veg_indian"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:text="Veg"
-        android:layout_weight="1"
-        />
+
     <FrameLayout
         android:id="@+id/frame_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-       <!-- <Button
-            android:id="@+id/add_btn_frame"
-            android:layout_widt h="100dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".1"
+        android:layout_gravity="center">
+       <Button
+            android:id="@+id/add_btn"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add"/>-->
+            android:text="Add"/>
         <LinearLayout
+            android:id="@+id/inc_dec"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">

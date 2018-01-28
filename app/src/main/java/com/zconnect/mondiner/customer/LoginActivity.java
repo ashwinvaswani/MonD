@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -18,7 +19,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,8 +34,8 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private SignInButton mGoogleBtn;
-    private Button newAccountbtn;
+    private Button mGoogleBtn;
+    private TextView newAccount;
     private static final int RC_SIGN_IN = 1;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mAuth;
@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         mDatabaseUsers.keepSynced(true);
 
 
-        mGoogleBtn = (SignInButton) findViewById(R.id.GoogleBtn);
+        mGoogleBtn = (Button) findViewById(R.id.GoogleBtn);
 
         mProgress = new ProgressDialog(this);
 
@@ -94,7 +94,15 @@ public class LoginActivity extends AppCompatActivity {
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        newAccountbtn = (Button) findViewById(R.id.newAccount);
+        newAccount = findViewById(R.id.newAccount);
+        newAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent setupIntent = new Intent(LoginActivity.this, Register_Activity.class);
+                setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(setupIntent);
+            }
+        });
 
         /*newAccountbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -264,6 +272,8 @@ public class LoginActivity extends AppCompatActivity {
       //  super.onStart();
         //mAuth.addAuthStateListener(mAuthListener);
     //}
+
+
 }
 
 

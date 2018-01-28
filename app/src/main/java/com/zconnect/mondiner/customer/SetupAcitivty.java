@@ -279,5 +279,13 @@ public class SetupAcitivty extends AppCompatActivity {
                         grantResults);
         }
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent setupIntent = new Intent(SetupAcitivty.this, QR_Offers_prevOrders.class);
+        setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(setupIntent);
+    }
 }
 
