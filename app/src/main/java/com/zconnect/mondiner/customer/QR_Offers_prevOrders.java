@@ -1,7 +1,9 @@
 package com.zconnect.mondiner.customer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,9 +28,10 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
     private IntentIntegrator qrScan;
 
     private DatabaseReference mUserName;
-
+    private FirebaseAuth mAuth;
     private DatabaseReference mRefRestID;
-
+    private SharedPreferences preferences;
+    private ValueEventListener restListener;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -56,7 +60,12 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
         qrScan = new IntentIntegrator(this);
         mRefRestID = FirebaseDatabase.getInstance().getReference().child("restaurants");
         mTextMessage = (TextView) findViewById(R.id.message);
-
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String userID = preferences.getString("userID", "");
+        String username = preferences.getString("username","");
+        Details.USER_ID = userID;
+        Details.USERNAME = username;
+        Log.e("QR_Offers_prevOrders --","User ID is : "+Details.USER_ID + "Username is : "+ Details.USERNAME);
         /*SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String userid = preferences.getString("UserID","");
         if(!userid.equalsIgnoreCase("")){
@@ -92,14 +101,15 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             if (result.getContents() == null) {
-                Toast.makeText(this, "QR error", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "QR not scanned", Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
                 Log.e("QrActivity", "QR Scanned = " + result.getContents());
-                String information[] = result.getContents().split(" ");
+                String information[] = result.getContents().split(";");
                 String RestID = information[0].trim();
+                String TableID = information[1].trim();
                 Log.e("QrActivity", "Table : " + information[1].trim());
-                checkRestId(RestID, information[1].trim());
+                checkRestId(RestID, TableID);
 
                 //info 0 RestID and info 1 has TableID
             }
@@ -110,7 +120,27 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
     }
 
     private void checkRestId(final String restID, final String tableID) {
-        mRefRestID.addValueEventListener(new ValueEventListener() {
+        restListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot childSnapShot : dataSnapshot.getChildren()) {
+                    if (childSnapShot.getKey().equals(restID)) {
+                        Log.e("QrActivity", "Rest ID found" + restID);
+                  //      Toast.makeText(QR_Offers_prevOrders.this, "The RestID was equal!", Toast.LENGTH_SHORT).show();
+                        checkTableID(childSnapShot, tableID, restID);
+                    } else {
+                        continue;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mRefRestID.addValueEventListener(restListener);
+        /*mRefRestID.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot childSnapShot : dataSnapshot.getChildren()) {
@@ -119,7 +149,7 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
                         Toast.makeText(QR_Offers_prevOrders.this, "The RestID was equal!", Toast.LENGTH_SHORT).show();
                         checkTableID(childSnapShot, tableID, restID);
                     } else {
-                        Toast.makeText(QR_Offers_prevOrders.this, "Restaurant ID not found", Toast.LENGTH_SHORT).show();
+                        continue;
                     }
                 }
             }
@@ -128,7 +158,7 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("QrActivity", "checkRestID : Database connection failed" + databaseError.toString());
             }
-        });
+        });*/
     }
 
     private void checkTableID(DataSnapshot childSnapShot, String tableID, String restID) {
@@ -138,20 +168,15 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
                         if(grandChildSnapShot.child("availability").getValue(String.class).equals("true") ||
                                 grandChildSnapShot.child("availability").getValue(String.class).equals("1") ) {
                             Log.e("QrActivity","Table available. NEW INTENT OPEN! COngo");
-        */
+        */      Details.REST_ID = restID;
+                Details.TABLE_ID = tableID;
                 mRefRestID.child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("availability").setValue("false");
                 Intent tomain = new Intent(QR_Offers_prevOrders.this, Tabbed_Menu.class);
-                tomain.putExtra("rest_id", restID);
-                tomain.putExtra("table_id", tableID);
+                Toast.makeText(this, "Please select your dishes...", Toast.LENGTH_SHORT).show();
+                mRefRestID.removeEventListener(restListener);
                 startActivity(tomain);
-
-                        /*else{
-                            Log.e("QrActivity","Table not available");
-                            Toast.makeText(this, "Table not available!", Toast.LENGTH_SHORT).show();
-                        }*/
             } else {
-                Log.e("QrActivity", "Table ID WRONG");
-                Toast.makeText(this, "Table not registered!", Toast.LENGTH_SHORT).show();
+                continue;
             }
         }
     }
@@ -159,11 +184,11 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        super.onStart();
+        super.onStart();/*
         Intent tomain = new Intent(QR_Offers_prevOrders.this, Tabbed_Menu.class);
         tomain.putExtra("rest_id", "redChillies");
         tomain.putExtra("table_id", "redChilliesTable_03");
-        startActivity(tomain);
+        startActivity(tomain);*/
     }
 
 }

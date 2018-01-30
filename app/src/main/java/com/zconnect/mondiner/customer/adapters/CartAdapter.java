@@ -19,8 +19,6 @@ import java.util.ArrayList;
 public class CartAdapter extends RecyclerView.Adapter<CartViewholder> {
 
     private ArrayList<DishOrdered> dishitems;
-
-
     public CartAdapter(ArrayList<DishOrdered> dishArray)    {
         dishitems = dishArray;
     }
@@ -39,6 +37,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewholder> {
         holder.itemQuantitytv.setText(dishitems.get(position).getDishQuantity());
         holder.itemPricetv.setText(dishitems.get(position).getDishPrice());
         holder.itemAmounttv.setText(dishitems.get(position).getDishAmount());
+        //TODO : Implement onClick item thing
+        // holder.openItem(dishitems.get(position).getDishID());
         //int amount = Integer.parseInt(dishitems.get(position).getDishPrice())*Integer.parseInt(dishitems.get(position).getDishQuantity());
         //holder.itemAmounttv.setText(amount+"");
     }

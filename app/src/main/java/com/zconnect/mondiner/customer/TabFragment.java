@@ -43,6 +43,14 @@ public class TabFragment extends Fragment {
                 String quantity = menus.get(i).getItemQuantity();
                 int totalQuantity = 0;
                 totalQuantity = Integer.parseInt(quantity);
+                for(DataSnapshot user : dish.child("users").getChildren()) {
+                    if(!user.getKey().equals(Details.USER_ID)) {
+                        totalQuantity = totalQuantity+Integer.parseInt(user.getValue(String.class));
+                    }
+                    else{
+                        continue;
+                    }
+                }
                 mTableRef.child(dish.getKey()).child("quantity").setValue(totalQuantity + "");
             }
             menuAdapter.notifyDataSetChanged();

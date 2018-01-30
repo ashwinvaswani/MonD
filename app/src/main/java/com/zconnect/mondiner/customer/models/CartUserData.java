@@ -8,6 +8,19 @@ public class CartUserData {
     private String userName;
     private String userID;
     private String userStatus;
+    private String userQuantity;
+
+    public String getUserQuantity() {
+        return userQuantity;
+    }
+
+    public void setUserQuantity(String userQuantity) {
+        this.userQuantity = userQuantity;
+    }
+
+    public CartUserData(String userQuantity) {
+        this.userQuantity = userQuantity;
+    }
 
     public CartUserData(String userName, String userID, String userQuantity) {
         this.userName = userName;

@@ -1,5 +1,6 @@
 package com.zconnect.mondiner.customer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,6 +41,8 @@ public class CartActivity extends AppCompatActivity {
     private TextView totalAmount;
     private int amount = 0;
     private TextView noItemCart;
+    private long size=0;
+    int counter=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +100,28 @@ public class CartActivity extends AppCompatActivity {
             }
 
         });
+        mTableRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot userID : dataSnapshot.getChildren()) {
+                    size = userID.getChildrenCount();
+                    if(userID.child("confirmStatus").getValue(String.class).equalsIgnoreCase("Yes")){
+                        counter++;
+                    }
+                }
+                Log.e("CartActivity"," -- size : "+size+"counter : "+counter);
+                if(counter==size){
+                    Intent setupIntent = new Intent(CartActivity.this, ConfirmationActivity.class);
+                    setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(setupIntent);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         confirmOrder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,14 +130,24 @@ public class CartActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot userID : dataSnapshot.getChildren()) {
-                            final CartUserData cartUserData = new CartUserData();
-                            cartUserData.setUserID(userID.getKey());
-                            cartUserData.setUserName(userID.child("name").getValue(String.class));
-                            mTableRef.child(userID.getKey()).child("confirmStatus").setValue("Yes");
-                            cartUserData.setUserStatus("Yes");
+                                final CartUserData cartUserData = new CartUserData();
+                                cartUserData.setUserID(userID.getKey());
+                                cartUserData.setUserName(userID.child("name").getValue(String.class));
+                                if (userID.getKey().equals(Details.USER_ID)){
+                                    mTableRef.child("activeUsers").child(userID.getKey()).child("confirmStatus").setValue("yes");
+
+                                }
+                            cartUserData.setUserStatus(userID.child("confirmStatus").getValue(String.class));
                             userData.add(cartUserData);
                             confirmOrder.setVisibility(View.GONE);
                             cartUserDatarv.setVisibility(View.VISIBLE);
+                            /*
+                                else{
+                                    cartUserData.setUserStatus(userID.child("confirmStatus").getValue(String.class));
+                                    userData.add(cartUserData);
+                                    confirmOrder.setVisibility(View.GONE);
+                                    cartUserDatarv.setVisibility(View.VISIBLE);
+                                }*/
                         }
                         userConfirmationAdapter.notifyDataSetChanged();
                     }
@@ -126,7 +161,6 @@ public class CartActivity extends AppCompatActivity {
                 cartUserDatarv.setAdapter(userConfirmationAdapter);
             }
         });
-
     }
 
     @Override

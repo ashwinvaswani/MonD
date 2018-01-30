@@ -88,7 +88,7 @@ public class ConfirmationActivity extends AppCompatActivity {
         callWaiter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mDataRef.child("callWaiter").setValue("True");
+                mDataRef.child("callWaiter").setValue("true");
                 Toast.makeText(ConfirmationActivity.this, "Please wait! Waiter coming...", Toast.LENGTH_SHORT).show();
             }
         });
@@ -103,4 +103,5 @@ public class ConfirmationActivity extends AppCompatActivity {
             }
         });
     }
+
 }

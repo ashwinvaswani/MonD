@@ -84,7 +84,7 @@ public class Tabbed_Menu extends AppCompatActivity {
 
         mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("currentOrder").child("activeUsers").child(Details.USER_ID);
         mTableRef.child("name").setValue(Details.USERNAME);
-        mTableRef.child("confirmStatus").setValue("No");
+        mTableRef.child("confirmStatus").setValue("no");
 
         //mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child("redChillies").child("info").child("servesCuisine");
         mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("categories");
