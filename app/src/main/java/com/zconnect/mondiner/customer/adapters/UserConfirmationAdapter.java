@@ -41,8 +41,8 @@ public class UserConfirmationAdapter extends RecyclerView.Adapter<CartUserConfir
         return this.userCartStatus.size();
     }
 
-    @Override
+    /*@Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-    }
+    }*/
 }

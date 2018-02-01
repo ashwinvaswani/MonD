@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 
 public class CartActivity extends AppCompatActivity {
 
+    private DatabaseReference mCurrentOrderRef;
     private DatabaseReference mTableRef;
     private RecyclerView cartContent;
     private RecyclerView cartUserDatarv;
@@ -56,9 +58,10 @@ public class CartActivity extends AppCompatActivity {
         noItemCart = findViewById(R.id.no_item_cart_text);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         cartContent.setLayoutManager(linearLayoutManager);
-
+        userConfirmationAdapter = new UserConfirmationAdapter(userData);
+        cartUserDatarv.setAdapter(userConfirmationAdapter);
         totalAmount = findViewById(R.id.total_text);
-        mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
+        mCurrentOrderRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
                 .child(Details.TABLE_ID).child("currentOrder");
 
         cartAdapter = new CartAdapter(dishitems);
@@ -66,7 +69,7 @@ public class CartActivity extends AppCompatActivity {
 
         dishAmount = 0;
         //TODO : Handle null exceptions from firebase
-        mTableRef.child("cart").addValueEventListener(new ValueEventListener() {
+        mCurrentOrderRef.child("cart").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 dishitems.clear();
@@ -100,7 +103,7 @@ public class CartActivity extends AppCompatActivity {
             }
 
         });
-        mTableRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
+        /*mCurrentOrderRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot userID : dataSnapshot.getChildren()) {
@@ -121,46 +124,66 @@ public class CartActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
+        });*/
+        cartUserDatarv.setVisibility(View.GONE);
+        confirmOrder.setVisibility(View.VISIBLE);
+        mCurrentOrderRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                userData.clear();
+                for (DataSnapshot userID : dataSnapshot.getChildren()) {
+                    final CartUserData cartUserData = new CartUserData();
+                    cartUserData.setUserID(userID.getKey());
+                    cartUserData.setUserName(userID.child("name").getValue(String.class));
+                    cartUserData.setUserStatus(userID.child("confirmStatus").getValue(String.class));
+                    //userData.add(cartUserData);
+                    userData.add(cartUserData);
+
+                }
+                userConfirmationAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
         });
 
         confirmOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mTableRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot userID : dataSnapshot.getChildren()) {
-                                final CartUserData cartUserData = new CartUserData();
-                                cartUserData.setUserID(userID.getKey());
-                                cartUserData.setUserName(userID.child("name").getValue(String.class));
-                                if (userID.getKey().equals(Details.USER_ID)){
-                                    mTableRef.child("activeUsers").child(userID.getKey()).child("confirmStatus").setValue("yes");
-
-                                }
-                            cartUserData.setUserStatus(userID.child("confirmStatus").getValue(String.class));
-                            userData.add(cartUserData);
-                            confirmOrder.setVisibility(View.GONE);
-                            cartUserDatarv.setVisibility(View.VISIBLE);
-                            /*
-                                else{
-                                    cartUserData.setUserStatus(userID.child("confirmStatus").getValue(String.class));
-                                    userData.add(cartUserData);
-                                    confirmOrder.setVisibility(View.GONE);
-                                    cartUserDatarv.setVisibility(View.VISIBLE);
-                                }*/
-                        }
-                        userConfirmationAdapter.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-                userConfirmationAdapter = new UserConfirmationAdapter(userData);
-                cartUserDatarv.setAdapter(userConfirmationAdapter);
+                mCurrentOrderRef.child("activeUsers").child(Details.USER_ID).child("confirmStatus").setValue("yes");
+//              userConfirmationAdapter.notifyDataSetChanged();
+                confirmOrder.setVisibility(View.GONE);
+                cartUserDatarv.setVisibility(View.VISIBLE);
             }
         });
+
+        mCurrentOrderRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int flag=0;
+                for(DataSnapshot user : dataSnapshot.getChildren()){
+                    if(user.child("confirmStatus").getValue(String.class).equalsIgnoreCase("no")){
+                        flag=1;
+                    }
+                }
+                if(flag==0){
+                    mCurrentOrderRef.child("orderConfirmation").setValue("yes");
+                    Toast.makeText(CartActivity.this, "Order confirmed by all users.", Toast.LENGTH_SHORT).show();
+                    Intent setupIntent = new Intent(CartActivity.this, ConfirmationActivity .class);
+                    setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(setupIntent);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     @Override

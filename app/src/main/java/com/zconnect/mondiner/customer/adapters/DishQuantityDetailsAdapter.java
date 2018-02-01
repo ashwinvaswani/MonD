@@ -18,6 +18,7 @@ import java.util.ArrayList;
 public class DishQuantityDetailsAdapter extends RecyclerView.Adapter<QuantityDetailsViewholder>{
 
     private ArrayList<CartUserData> userData;
+
     public DishQuantityDetailsAdapter(ArrayList<CartUserData> cartUserData){
         this.userData = cartUserData;
     }
@@ -31,16 +32,17 @@ public class DishQuantityDetailsAdapter extends RecyclerView.Adapter<QuantityDet
 
     @Override
     public void onBindViewHolder(QuantityDetailsViewholder holder, int position) {
-
+        holder.userName.setText(userData.get(position).getUserName());
+        holder.userQuantity.setText(userData.get(position).getUserQuantity());
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return this.userData.size();
     }
 
-    @Override
+    /*@Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-    }
+    }*/
 }

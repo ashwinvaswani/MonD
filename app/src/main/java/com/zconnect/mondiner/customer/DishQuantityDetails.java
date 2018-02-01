@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,31 +31,38 @@ public class DishQuantityDetails extends AppCompatActivity {
         setContentView(R.layout.activity_user_details_for_item);
         userQuantityrv = findViewById(R.id.user_details_rv);
         userQuantityrv.setLayoutManager(new LinearLayoutManager(this));
-        userQuantityrv.setAdapter(new DishQuantityDetailsAdapter(new ArrayList<CartUserData>()));
+        dishQuantityDetailsAdapter = new DishQuantityDetailsAdapter(userData);
+        userQuantityrv.setAdapter(dishQuantityDetailsAdapter);
         Bundle bundle = getIntent().getExtras();
         dishId = bundle.getString("dishID");
         mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
                 .child(Details.TABLE_ID).child("currentOrder");
-
+        Log.e("DishQuantityDetails", "" + Details.DISH_ID);
         mTableRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot userID : dataSnapshot.getChildren()) {
+                for (final DataSnapshot userID : dataSnapshot.getChildren()) {
                     final CartUserData cartUserData = new CartUserData();
                     cartUserData.setUserID(userID.getKey());
                     cartUserData.setUserName(userID.child("name").getValue(String.class));
-                    mTableRef.child("cart").child(dishId).child("users").child(userID.getKey()).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            cartUserData.setUserQuantity(dataSnapshot.getValue(String.class));
-                            userData.add(cartUserData);
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                    if(userID.getKey()!=null) {
+                        mTableRef.child("cart").child(Details.DISH_ID).child("users").child(userID.getKey()).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.getValue(String.class)!=null) {
+                                    cartUserData.setUserQuantity(dataSnapshot.getValue(String.class));
+                                    userData.add(cartUserData);
+             //                       dishQuantityDetailsAdapter = new DishQuantityDetailsAdapter(userData);
+                                    dishQuantityDetailsAdapter.notifyDataSetChanged();
+                                    Log.e("DishQuantityDetails", "Name : " + userID.child("name").getValue(String.class) +
+                                            "; Quantity : " + dataSnapshot.getValue(String.class));
+                                }
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
+                        });
+                    }
                 }
                 dishQuantityDetailsAdapter.notifyDataSetChanged();
             }
@@ -64,6 +72,7 @@ public class DishQuantityDetails extends AppCompatActivity {
 
             }
         });
-        dishQuantityDetailsAdapter = new DishQuantityDetailsAdapter(userData);
+
     }
 }
+

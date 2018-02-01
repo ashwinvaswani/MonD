@@ -17,5 +17,5 @@ public class Details {
     public static int CUISINE_INDEX=0;
     public static String USER_ID = "";
     public static String USERNAME = "";
-
+    public static String DISH_ID = "";
 }

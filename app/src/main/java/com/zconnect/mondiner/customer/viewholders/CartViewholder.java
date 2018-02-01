@@ -3,12 +3,14 @@ package com.zconnect.mondiner.customer.viewholders;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.zconnect.mondiner.customer.R;
 import com.zconnect.mondiner.customer.DishQuantityDetails;
+import com.zconnect.mondiner.customer.utils.Details;
 
 /**
  * Created by Ishaan on 21-01-2018.
@@ -40,6 +42,8 @@ public class CartViewholder extends RecyclerView.ViewHolder{
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
+                Log.e("CartViewholder",""+dishID);
+                Details.DISH_ID = dishID;
                 intent.setClass(itemView.getContext(), DishQuantityDetails.class).putExtra(dishID, "dishID");
                 ((Activity) itemView.getContext()).startActivity(intent);
             }

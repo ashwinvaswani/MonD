@@ -105,7 +105,8 @@ public class TabFragment extends Fragment {
                 for (final DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                     if (childSnapshot.child("name").exists() &&
                             childSnapshot.child("price").exists() &&
-                            childSnapshot.child("type").exists()) {
+                            childSnapshot.child("type").exists() &&
+                            childSnapshot.child("availability").getValue(String.class).equalsIgnoreCase("true")) {
                         Menu m = new Menu();
                         dishIDs.add(childSnapshot.getKey());
                         m.setItemName(childSnapshot.child("name").getValue(String.class));

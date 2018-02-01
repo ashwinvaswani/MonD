@@ -31,6 +31,7 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference mRefRestID;
     private SharedPreferences preferences;
+    private SharedPreferences preferencesQRData;
     private ValueEventListener restListener;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -108,6 +109,11 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
                 String information[] = result.getContents().split(";");
                 String RestID = information[0].trim();
                 String TableID = information[1].trim();
+                preferencesQRData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor editor = preferencesQRData.edit();
+                editor.putString("restaurantId", RestID);
+                editor.putString("currentTableId",TableID);
+                editor.apply();
                 Log.e("QrActivity", "Table : " + information[1].trim());
                 checkRestId(RestID, TableID);
 
@@ -167,9 +173,13 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
         /*        if(grandChildSnapShot.child("availability").getValue(String.class)!=null){
                         if(grandChildSnapShot.child("availability").getValue(String.class).equals("true") ||
                                 grandChildSnapShot.child("availability").getValue(String.class).equals("1") ) {
-                            Log.e("QrActivity","Table available. NEW INTENT OPEN! COngo");
-        */      Details.REST_ID = restID;
-                Details.TABLE_ID = tableID;
+                            Log.e("QrActivity","Table available. NEW INTENT OPEN! COngo");*/
+                preferencesQRData = PreferenceManager.getDefaultSharedPreferences(this);
+                String restaurantId = preferencesQRData.getString("restaurantId", "");
+                String currentTableId = preferencesQRData.getString("currentTableId","");
+                Details.REST_ID = restaurantId;
+                Details.TABLE_ID = currentTableId;
+                Log.e("QRActivity","Checking shared preferences : " + Details.REST_ID + "--" + Details.TABLE_ID);
                 mRefRestID.child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("availability").setValue("false");
                 Intent tomain = new Intent(QR_Offers_prevOrders.this, Tabbed_Menu.class);
                 Toast.makeText(this, "Please select your dishes...", Toast.LENGTH_SHORT).show();
