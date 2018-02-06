@@ -73,25 +73,29 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 dishitems.clear();
-
+                amount =0;
                 for (final DataSnapshot dishid : dataSnapshot.getChildren()) {
                     final DishOrdered dishOrdered = new DishOrdered();
-
-                    if (!(Integer.parseInt(dishid.child("quantity").getValue(String.class)) == 0)) {
-                        dishOrdered.setDishID(dishid.getKey());
-                        dishOrdered.setDishName(dishid.child("name").getValue(String.class));
-                        dishOrdered.setDishPrice(dishid.child("price").getValue(String.class));
-                        dishOrdered.setDishQuantity(dishid.child("quantity").getValue(String.class));
-                        dishQuantity = Integer.parseInt(dishid.child("quantity").getValue(String.class));
-                        dishAmount = Integer.parseInt(dishid.child("quantity").getValue(String.class)) * Integer.parseInt(dishid.child("price").getValue(String.class));
-                        dishOrdered.setDishAmount(dishAmount + "");
-                        amount += dishAmount;
-                        Log.e("amount : ", "" + amount);
-                        dishitems.add(dishOrdered);
-                        totalAmount.setText(amount + "");
-                        if (dishitems.size() != 0) {
-                            noItemCart.setVisibility(View.GONE);
+                    try {
+                        if (!(Integer.parseInt(dishid.child("quantity").getValue(String.class)) == 0)) {
+                            dishOrdered.setDishID(dishid.getKey());
+                            dishOrdered.setDishName(dishid.child("name").getValue(String.class));
+                            dishOrdered.setDishPrice(dishid.child("price").getValue(String.class));
+                            dishOrdered.setDishQuantity(dishid.child("quantity").getValue(String.class));
+                            dishQuantity = Integer.parseInt(dishid.child("quantity").getValue(String.class));
+                            dishAmount = Integer.parseInt(dishid.child("quantity").getValue(String.class)) * Integer.parseInt(dishid.child("price").getValue(String.class));
+                            dishOrdered.setDishAmount(dishAmount + "");
+                            amount += dishAmount;
+                            Log.e("amount : ", "" + amount);
+                            dishitems.add(dishOrdered);
+                            totalAmount.setText(amount + "");
+                            if (dishitems.size() != 0) {
+                                noItemCart.setVisibility(View.GONE);
+                            }
                         }
+                    }
+                    catch(Exception e){
+                        Log.e("CartActivity",""+e);
                     }
                 }
                 cartAdapter.notifyDataSetChanged();
@@ -104,7 +108,7 @@ public class CartActivity extends AppCompatActivity {
 
         });
         /*mCurrentOrderRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
-            @Override
+            @   Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot userID : dataSnapshot.getChildren()) {
                     size = userID.getChildrenCount();
@@ -165,7 +169,7 @@ public class CartActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 int flag=0;
                 for(DataSnapshot user : dataSnapshot.getChildren()){
-                    if(user.child("confirmStatus").getValue(String.class).equalsIgnoreCase("no")){
+                        if(user.child("confirmStatus").getValue(String.class).equalsIgnoreCase("no")){
                         flag=1;
                     }
                 }

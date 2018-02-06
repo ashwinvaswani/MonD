@@ -22,13 +22,7 @@
         <activity
             android:name=".UnusedMainActivity"
             android:screenOrientation="userPortrait"
-            tools:replace="screenOrientation">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            tools:replace="screenOrientation" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
@@ -43,11 +37,20 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Tabbed_Menu"
-            android:label="@string/title_activity_tabbed__menu"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <activity android:name=".CartActivity" />
         <activity android:name=".ConfirmationActivity" />
-        <activity android:name=".DishQuantityDetails"></activity>
+        <activity android:name=".DishQuantityDetails" />
+        <activity android:name=".PreviousOrdersActivity" />
+        <activity android:name=".SplashActivity"
+            android:label="monDiner"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

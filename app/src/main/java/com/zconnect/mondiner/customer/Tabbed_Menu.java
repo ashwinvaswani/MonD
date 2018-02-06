@@ -1,7 +1,10 @@
 package com.zconnect.mondiner.customer;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -53,19 +56,31 @@ public class Tabbed_Menu extends AppCompatActivity {
     TabLayout tabLayout;
     DatabaseReference mMenuRef;
     private DatabaseReference mTableRef;
+    private SharedPreferences preferences;
+    private SharedPreferences preferencesQRData;
+    private ProgressDialog mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed__menu);
-
-
+        preferencesQRData = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String restaurantId = preferencesQRData.getString("restaurantId", "");
+        String currentTableId = preferencesQRData.getString("currentTableId","");
+        String userID = preferences.getString("userID", "");
+        String username = preferences.getString("username","");
+        Details.REST_ID = restaurantId;
+        Details.TABLE_ID = currentTableId;
+        Details.USER_ID = userID;
+        Details.USERNAME = username;
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage("Loading");
+        mProgress.show();
+        mProgress.setCancelable(false);
         //incDec = findViewById(R.id.inc_dec);
-        String rest_id = getIntent().getStringExtra("rest_id");
-        String table_id = getIntent().getStringExtra("table_id");
         //Details.REST_ID = rest_id;
         //Details.TABLE_ID = table_id;
-        Log.e("Tabbed_Menu", "rest_id" + rest_id + "table_id" + table_id);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -85,6 +100,14 @@ public class Tabbed_Menu extends AppCompatActivity {
         mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("currentOrder").child("activeUsers").child(Details.USER_ID);
         mTableRef.child("name").setValue(Details.USERNAME);
         mTableRef.child("confirmStatus").setValue("no");
+
+       /* findViewById(R.id.action_prev_orders).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent tomain = new Intent(Tabbed_Menu.this, PreviousOrdersActivity.class);
+                startActivity(tomain);
+            }
+        });*/
 
         //mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child("redChillies").child("info").child("servesCuisine");
         mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("categories");
@@ -280,6 +303,7 @@ public class Tabbed_Menu extends AppCompatActivity {
         public void addFrag(Fragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
+            mProgress.hide();
 //            noItemText.setText("No" + title + "items to show");
         }
 
@@ -289,6 +313,25 @@ public class Tabbed_Menu extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        preferencesQRData = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String restaurantId = preferencesQRData.getString("restaurantId", "");
+        String currentTableId = preferencesQRData.getString("currentTableId","");
+        String userID = preferences.getString("userID", "");
+        String username = preferences.getString("username","");
+        Log.e("Tabbed_Menu","The details are : "+ restaurantId +" "+ currentTableId+ " " + userID+" " + username);
+        if(userID==null || userID.isEmpty()){
+            Intent tomain = new Intent(Tabbed_Menu.this, LoginActivity.class);
+            startActivity(tomain);
+        }
+        else if(restaurantId==null || restaurantId.isEmpty() || currentTableId==null || currentTableId.isEmpty()){
+            Intent tomain = new Intent(Tabbed_Menu.this, QR_Offers_prevOrders.class);
+            startActivity(tomain);
+        }
+    }
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.

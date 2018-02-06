@@ -57,7 +57,7 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bottom_nav);
+        setContentView(R.layout.qr_offers_prevorders);
         qrScan = new IntentIntegrator(this);
         mRefRestID = FirebaseDatabase.getInstance().getReference().child("restaurants");
         mTextMessage = (TextView) findViewById(R.id.message);
@@ -74,7 +74,14 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
         }
 
         Log.e("QR_Offers_prevOrders","This is the userID obtained : " + userid);
-*/
+*//*
+        final View offers = findViewById(R.id.navigation_offers);
+        offers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                offers.setBackgroundColor(Color.BLUE);
+            }
+        });*/
         mUserName = FirebaseDatabase.getInstance().getReference().child("Users").child(Details.USER_ID).child("username");
 /*        mUserName.addValueEventListener(new ValueEventListener() {
             @Override

@@ -61,19 +61,23 @@ public class ConfirmationActivity extends AppCompatActivity {
 
                 for (final DataSnapshot dishid : dataSnapshot.getChildren()) {
                     final DishOrdered dishOrdered = new DishOrdered();
-
-                    if (!(Integer.parseInt(dishid.child("quantity").getValue(String.class)) == 0)) {
-                        dishOrdered.setDishID(dishid.getKey());
-                        dishOrdered.setDishName(dishid.child("name").getValue(String.class));
-                        dishOrdered.setDishPrice(dishid.child("price").getValue(String.class));
-                        dishOrdered.setDishQuantity(dishid.child("quantity").getValue(String.class));
-                        dishQuantity = Integer.parseInt(dishid.child("quantity").getValue(String.class));
-                        dishAmount = Integer.parseInt(dishid.child("quantity").getValue(String.class)) * Integer.parseInt(dishid.child("price").getValue(String.class));
-                        dishOrdered.setDishAmount(dishAmount + "");
-                        amount+=dishAmount;
-                        Log.e("amount : ",""+amount);
-                        dishitems.add(dishOrdered);
-                        totalAmount.setText(amount + "");
+                    try {
+                        if (!(Integer.parseInt(dishid.child("quantity").getValue(String.class)) == 0)) {
+                            dishOrdered.setDishID(dishid.getKey());
+                            dishOrdered.setDishName(dishid.child("name").getValue(String.class));
+                            dishOrdered.setDishPrice(dishid.child("price").getValue(String.class));
+                            dishOrdered.setDishQuantity(dishid.child("quantity").getValue(String.class));
+                            dishQuantity = Integer.parseInt(dishid.child("quantity").getValue(String.class));
+                            dishAmount = Integer.parseInt(dishid.child("quantity").getValue(String.class)) * Integer.parseInt(dishid.child("price").getValue(String.class));
+                            dishOrdered.setDishAmount(dishAmount + "");
+                            amount += dishAmount;
+                            Log.e("amount : ", "" + amount);
+                            dishitems.add(dishOrdered);
+                            totalAmount.setText(amount + "");
+                        }
+                    }
+                    catch (Exception e){
+                        Log.e("ConfirmationActivity",""+e);
                     }
                 }
                 cartAdapter.notifyDataSetChanged();

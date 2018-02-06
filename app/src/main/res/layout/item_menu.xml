@@ -3,26 +3,31 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:weightSum="1"
+    android:background="@color/background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <RelativeLayout
         android:layout_width="0dp"
-        android:layout_weight=".2"
+        android:layout_weight=".3"
         android:padding="5dp"
         android:layout_height="match_parent">
 
-        <ImageView
+        <android.support.v4.widget.CircleImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+        <!--<ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorAccent"
             android:layout_alignParentTop="true"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop"/>-->
 
     </RelativeLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight=".8"
+        android:layout_weight=".7"
         android:orientation="vertical">
 
         <TextView
@@ -32,7 +37,8 @@
             android:text="Paneer"
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:textColor="#FFF"/>
 
         <TextView
             android:id="@+id/item_price_indian"
@@ -41,7 +47,8 @@
             android:text="200"
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textColor="#FFF"/>
     </LinearLayout>
 
     <!--<FrameLayout
@@ -59,13 +66,16 @@
             android:id="@+id/inc_dec"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_weight="0.2">
 
             <Button
                 android:id="@+id/decrement_button"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:text="-" />
+                android:text="-"
+                android:background="@drawable/round_button_layout"
+                android:textColor="#FFF"/>
 
             <TextView
                 android:id="@+id/quantity_display"
@@ -74,12 +84,15 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:text="0"
+                android:textColor="#FFF"
                 />
 
             <Button
                 android:id="@+id/increment_button"
                 android:layout_width="50dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/round_button_layout"
+                android:textColor="#FFF"
                 android:text="+" />
 
         </LinearLayout>

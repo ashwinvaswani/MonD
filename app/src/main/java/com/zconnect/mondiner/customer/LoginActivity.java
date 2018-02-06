@@ -209,7 +209,7 @@ public class LoginActivity extends AppCompatActivity {
     private void firebaseAuthWithGoogle(final GoogleSignInAccount account) {
 
         Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
-        mProgress.setMessage("loading please wait");
+        mProgress.setMessage("Please wait...");
         mProgress.show();
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         mAuth.signInWithCredential(credential)

@@ -7,7 +7,6 @@
     android:id="@+id/layout_signin"
     tools:context="com.zconnect.mondiner.customer.LoginActivity"
     android:background="@color/background">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,6 +28,7 @@
             android:drawableLeft="@drawable/ic_mail"
             android:drawablePadding="10dp"
             android:textColorHint="@color/hint"
+            android:textColor="@color/text"
             android:paddingTop="20dp"/>
         />
 
@@ -41,6 +41,8 @@
             android:drawablePadding="10dp"
             android:bottomRightRadius="15dp"
             android:hint="Password"
+            android:textColor="@color/text"
+            android:inputType="textPassword"
             android:topLeftRadius="15dp"
             android:topRightRadius="0dp" />
 
@@ -50,7 +52,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/primary_button_layout"
             android:text="SIGN IN"
-            android:textColor="#ffffff"
+            android:textColor="@color/text"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:layout_marginBottom="10dp"
@@ -61,7 +63,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/secondary_button_layout"
             android:text="SIGN IN with google"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"></Button>
         <LinearLayout
@@ -69,13 +71,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="20dp"
-            android:layout_gravity="center">
+            android:layout_gravity="center_horizontal">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="Not an existing user?"
-                android:textColor="#FFFFFF"/>
+                android:textColor="@color/text"/>
             <TextView
                 android:id="@+id/newAccount"
                 android:layout_width="wrap_content"
@@ -85,9 +87,5 @@
                 android:clickable="true"/>
         </LinearLayout>
     </LinearLayout>
-
-
-
-
-
 </android.support.constraint.ConstraintLayout>
+

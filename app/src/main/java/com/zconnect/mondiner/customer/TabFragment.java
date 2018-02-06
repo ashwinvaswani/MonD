@@ -103,16 +103,21 @@ public class TabFragment extends Fragment {
                 dishIDs.clear();
                 //TODO : Handle null pointer exception for price and type
                 for (final DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                    if (childSnapshot.child("name").exists() &&
-                            childSnapshot.child("price").exists() &&
-                            childSnapshot.child("type").exists() &&
-                            childSnapshot.child("availability").getValue(String.class).equalsIgnoreCase("true")) {
-                        Menu m = new Menu();
-                        dishIDs.add(childSnapshot.getKey());
-                        m.setItemName(childSnapshot.child("name").getValue(String.class));
-                        m.setItemPrice(childSnapshot.child("price").getValue(String.class));
-                        m.setVegNonVeg(childSnapshot.child("type").getValue(String.class));
-                        menus.add(m);
+                    try {
+                        if (childSnapshot.child("name").exists() &&
+                                childSnapshot.child("price").exists() &&
+                                childSnapshot.child("type").exists() &&
+                                childSnapshot.child("availability").getValue(String.class).equalsIgnoreCase("true")) {
+                            Menu m = new Menu();
+                            dishIDs.add(childSnapshot.getKey());
+                            m.setItemName(childSnapshot.child("name").getValue(String.class));
+                            m.setItemPrice(childSnapshot.child("price").getValue(String.class));
+                            m.setVegNonVeg(childSnapshot.child("type").getValue(String.class));
+                            menus.add(m);
+                        }
+                    }
+                    catch (Exception e){
+                        Log.e("TabFragment",""+e);
                     }
                 }
                 if (menus.size() != 0) {
