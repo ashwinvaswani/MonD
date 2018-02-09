@@ -1,5 +1,7 @@
 package com.zconnect.mondiner.customer.models;
 
+import android.net.Uri;
+
 /**
  * Created by Ishaan on 11-01-2018.
  */
@@ -13,6 +15,15 @@ public class Menu {
     private String vegNonVeg;
     private boolean availability;
     private String  itemQuantity;
+    private String imageUri;
+
+    public String getImageUri() {
+        return imageUri;
+    }
+
+    public void setImageUri(String imageUri) {
+        this.imageUri = imageUri;
+    }
 
     public Menu(){
 
@@ -30,12 +41,13 @@ public class Menu {
         this.itemCuisine = itemCuisine;
     }
 
-    public Menu(String itemName, String itemPrice, String vegNonVeg, boolean availability, String itemQuantity) {
+    public Menu(String itemName, String itemPrice, String vegNonVeg, boolean availability, String itemQuantity, String imageUri) {
         this.itemName = itemName;
         this.itemPrice = itemPrice;
         this.vegNonVeg = vegNonVeg;
         this.availability = availability;
         this.itemQuantity = itemQuantity;
+        this.imageUri = imageUri;
     }
 
     public String getItemName() {

@@ -2,6 +2,7 @@ package com.zconnect.mondiner.customer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -50,9 +53,17 @@ public class CartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
+        setTitle("Cart");
+
+        android.support.v7.widget.Toolbar toolbar =  findViewById(R.id.cart_toolbar);
+        setSupportActionBar(toolbar);
+        //TODO : Align the toolbar text to centre
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.center_text_title_bar);
+
         cartContent = findViewById(R.id.cart_recyclerview);
         cartUserDatarv = findViewById(R.id.user_cart_status);
-        cartUserDatarv.setLayoutManager(new LinearLayoutManager(this));
+        cartUserDatarv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         cartUserDatarv.setAdapter(new UserConfirmationAdapter(new ArrayList<CartUserData>()));
         confirmOrder = findViewById(R.id.confirm_order);
         noItemCart = findViewById(R.id.no_item_cart_text);
@@ -64,7 +75,7 @@ public class CartActivity extends AppCompatActivity {
         mCurrentOrderRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
                 .child(Details.TABLE_ID).child("currentOrder");
 
-        cartAdapter = new CartAdapter(dishitems);
+        cartAdapter = new CartAdapter(dishitems, getApplicationContext());
         cartContent.setAdapter(cartAdapter);
 
         dishAmount = 0;
@@ -84,11 +95,11 @@ public class CartActivity extends AppCompatActivity {
                             dishOrdered.setDishQuantity(dishid.child("quantity").getValue(String.class));
                             dishQuantity = Integer.parseInt(dishid.child("quantity").getValue(String.class));
                             dishAmount = Integer.parseInt(dishid.child("quantity").getValue(String.class)) * Integer.parseInt(dishid.child("price").getValue(String.class));
-                            dishOrdered.setDishAmount(dishAmount + "");
+                            dishOrdered.setDishAmount(""+dishAmount);
                             amount += dishAmount;
                             Log.e("amount : ", "" + amount);
                             dishitems.add(dishOrdered);
-                            totalAmount.setText(amount + "");
+                            totalAmount.setText(getResources().getString(R.string.Rs) + amount);
                             if (dishitems.size() != 0) {
                                 noItemCart.setVisibility(View.GONE);
                             }
@@ -139,7 +150,9 @@ public class CartActivity extends AppCompatActivity {
                 for (DataSnapshot userID : dataSnapshot.getChildren()) {
                     final CartUserData cartUserData = new CartUserData();
                     cartUserData.setUserID(userID.getKey());
-                    cartUserData.setUserName(userID.child("name").getValue(String.class));
+                    String userName = userID.child("name").getValue(String.class);
+                    String userNameParts[] = userName.trim().split(" ");
+                    cartUserData.setUserName(userNameParts[0]);
                     cartUserData.setUserStatus(userID.child("confirmStatus").getValue(String.class));
                     //userData.add(cartUserData);
                     userData.add(cartUserData);
@@ -197,6 +210,7 @@ public class CartActivity extends AppCompatActivity {
         setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(setupIntent);*/
     }
+
 }
 
 

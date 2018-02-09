@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    tools:context="com.zconnect.mondiner.customer.ConfirmationActivity">
+    tools:context="com.zconnect.mondiner.customer.ConfirmationActivity"
+    android:background="@color/background">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
         <TextView
             android:layout_width="match_parent"
@@ -16,22 +17,13 @@
             android:gravity="center"
             android:textColor="#66be30"
             android:textSize="26dp" />
-        <Button
-            android:id="@+id/call_waiter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="CALL WAITER"
-            android:layout_marginTop="20dp"
-            />
-        <Button
-            android:id="@+id/order_add"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Order Something else?"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Your order:"
+            android:text="Your order"
+            android:textColor="@color/text"
+            android:textAlignment="center"
             android:textSize="20dp"/>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/order_confirm_rv"
@@ -40,9 +32,59 @@
             android:layout_marginTop="10dp"
             >
         </android.support.v7.widget.RecyclerView>
-        <TextView
-            android:id="@+id/confirm_total_amount"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:weightSum="100"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp">
+            <TextView
+                android:layout_weight="70"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Amount Payable : "
+                android:textSize="20sp"
+                android:textColor="#FFF"/>
+            <TextView
+                android:id="@+id/confirm_total_amount"
+                android:layout_weight="30"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:text="@string/Rs"
+                android:textColor="#FFF"
+                android:textSize="20sp"
+                android:textAlignment="textEnd"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:weightSum="100">
+            <Button
+                android:id="@+id/call_waiter"
+                android:layout_weight="50"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="CALL WAITER"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="bottom"
+                android:textColor="@color/text"
+                android:layout_margin="5dp"
+                android:background="@drawable/primary_button_layout"
+                />
+            <Button
+                android:id="@+id/order_add"
+                android:layout_weight="50"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:textColor="@color/text"
+                android:layout_gravity="bottom"
+                android:text="Order Something else?"
+                android:layout_margin="5dp"
+                android:background="@drawable/primary_button_layout"/>
+        </LinearLayout>
     </LinearLayout>
-</ScrollView>
+</LinearLayout>

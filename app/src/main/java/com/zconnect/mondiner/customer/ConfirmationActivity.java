@@ -50,7 +50,7 @@ public class ConfirmationActivity extends AppCompatActivity {
         mDataRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
                 .child(Details.TABLE_ID);
         cartContent.setLayoutManager(new LinearLayoutManager(this));
-        cartAdapter = new CartAdapter(dishitems);
+        cartAdapter = new CartAdapter(dishitems, getApplicationContext());
         cartContent.setAdapter(cartAdapter);
         dishAmount = 0;
         //TODO : Handle null exceptions from firebase

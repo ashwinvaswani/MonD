@@ -32,8 +32,7 @@ public class UserConfirmationAdapter extends RecyclerView.Adapter<CartUserConfir
 
     @Override
     public void onBindViewHolder(CartUserConfirmationViewholder holder, int position) {
-        holder.userName.setText(userCartStatus.get(position).getUserName());
-        holder.userStatus.setText(userCartStatus.get(position).getUserStatus());
+        holder.populate(userCartStatus.get(position));
     }
 
     @Override

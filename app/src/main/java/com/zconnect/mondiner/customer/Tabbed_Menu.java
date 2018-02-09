@@ -20,6 +20,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,15 +56,32 @@ public class Tabbed_Menu extends AppCompatActivity {
     private ArrayList<Tabs> tabsInfo = new ArrayList<>();
     private TextView noItemText;
     TabLayout tabLayout;
-    DatabaseReference mMenuRef;
+    private DatabaseReference mMenuRef;
+    private DatabaseReference mRestRef;
     private DatabaseReference mTableRef;
     private SharedPreferences preferences;
     private SharedPreferences preferencesQRData;
     private ProgressDialog mProgress;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mRestRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child("redChillies").child("info").child("name");
+        mRestRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.e("Tabbed_Menu","Name of Restaurant : "+dataSnapshot.getValue(String.class));
+                setTitle(dataSnapshot.getValue(String.class));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        mAuth = FirebaseAuth.getInstance();
+        Fresco.initialize(this);
         setContentView(R.layout.activity_tabbed__menu);
         preferencesQRData = PreferenceManager.getDefaultSharedPreferences(this);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -82,15 +101,15 @@ public class Tabbed_Menu extends AppCompatActivity {
         //Details.REST_ID = rest_id;
         //Details.TABLE_ID = table_id;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         //mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         noItemText = findViewById(R.id.no_item_text);
         tabLayout = findViewById(R.id.tabs);
-        toolbar = findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(" Red Chillies");
+
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.container);
@@ -109,7 +128,8 @@ public class Tabbed_Menu extends AppCompatActivity {
             }
         });*/
 
-        //mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child("redChillies").child("info").child("servesCuisine");
+
+
         mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("categories");
         mMenuRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -168,8 +188,9 @@ public class Tabbed_Menu extends AppCompatActivity {
                 startActivity(tomain);
             }
         });
-
     }
+
+
 
 /*
     private void setupDishesID() {
@@ -237,9 +258,23 @@ public class Tabbed_Menu extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
+        if (id == R.id.action_scan_qr) {
+            Intent setupIntent = new Intent(Tabbed_Menu.this, QR_Offers_prevOrders.class);
+            setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            preferencesQRData.edit().clear();
+            startActivity(setupIntent);
+            return true;
+        }
+        else if(id == R.id.action_signout){
+            Intent setupIntent = new Intent(Tabbed_Menu.this, LoginActivity.class);
+            setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            preferences.edit().clear();
+            Details.USER_ID = "";
+            Details.USERNAME = "";
+            mAuth.signOut();
+            startActivity(setupIntent);
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }

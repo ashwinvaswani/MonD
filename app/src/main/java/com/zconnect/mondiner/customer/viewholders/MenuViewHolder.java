@@ -1,13 +1,22 @@
 package com.zconnect.mondiner.customer.viewholders;
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.zconnect.mondiner.customer.R;
 import com.zconnect.mondiner.customer.models.Menu;
 import com.zconnect.mondiner.customer.utils.Details;
@@ -19,6 +28,8 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     private TextView itemVegtv;
     private Button decrement;
     private Button increment;
+    private ImageView vegNonVegImage;
+    private SimpleDraweeView draweeView;
     //private Button addItem;
     private TextView quantityDisplay;
     private final DatabaseReference mTableRef;
@@ -33,7 +44,8 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         increment = itemView.findViewById(R.id.increment_button);
         quantityDisplay = itemView.findViewById(R.id.quantity_display);
         //addItem = itemView.findViewById(R.id.add_btn);
-
+        vegNonVegImage = itemView.findViewById(R.id.veg_nonveg);
+        draweeView = itemView.findViewById(R.id.dish_image);
         this.mTableRef = FirebaseDatabase.getInstance().getReference()
                 .child("restaurants")
                 .child(Details.REST_ID)
@@ -44,15 +56,39 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
                 //.child("dishes");
     }
 
-    public void populate(final com.zconnect.mondiner.customer.models.Menu menu, final String dishId) {
+    public void populate(final com.zconnect.mondiner.customer.models.Menu menu, final String dishId, final String rsSymbol, final Context context) {
         this.menu = menu;
         this.dishId = dishId;
         itemNametv.setText(menu.getItemName());
-        itemPricetv.setText(menu.getItemPrice());
+        itemPricetv.setText(rsSymbol + menu.getItemPrice());
 //        itemVegtv.setText(menu.getVegNonVeg());
         quantityDisplay.setText(menu.getItemQuantity());
+        if(!menu.getImageUri().equalsIgnoreCase("")) {
+            Uri uri = Uri.parse(menu.getImageUri());
+            draweeView.setImageURI(uri);
+        }
+        String vegNonVeg = menu.getVegNonVeg();
+        if(vegNonVeg.equalsIgnoreCase("veg")){
+            vegNonVegImage.setBackgroundResource(R.drawable.veg_symbol);
+        }
+        else{
+            vegNonVegImage.setBackgroundResource(R.drawable.non_veg_symbol);
+        }
         increment.setOnClickListener(this);
         decrement.setOnClickListener(this);
+        int i = Integer.parseInt(menu.getItemQuantity());
+        if(i <= 0)
+        {
+            increment.setBackgroundResource(R.drawable.round_button_layout_white);
+            decrement.setBackgroundResource(R.drawable.round_button_layout_white);
+            itemNametv.setTextColor(context.getResources().getColor(R.color.text));
+        }
+        else
+        {
+            increment.setBackgroundResource(R.drawable.round_button_layout);
+            decrement.setBackgroundResource(R.drawable.round_button_layout);
+            itemNametv.setTextColor(context.getResources().getColor(R.color.colorAccent));
+        }
         //addItem.setOnClickListener(this);
     }
 
@@ -64,6 +100,8 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
                 Log.e("MenuViewHolder" +
                         " ", "in textview" + quantityDisplay.getText().toString());
                 i = Integer.parseInt(menu.getItemQuantity()) + 1;
+                increment.setBackgroundResource(R.drawable.round_button_layout);
+                decrement.setBackgroundResource(R.drawable.round_button_layout);
                 menu.setItemQuantity(i + "");
                 mTableRef.child(dishId).child("price").setValue(menu.getItemPrice());
                 mTableRef.child(dishId).child("name").setValue(menu.getItemName());
@@ -78,6 +116,8 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
                     quantityDisplay.setText("0");
                     mTableRef.child(dishId).child("price").setValue(menu.getItemPrice());
                     mTableRef.child(dishId).child("name").setValue(menu.getItemName());
+                    increment.setBackgroundResource(R.drawable.round_button_layout_white);
+                    decrement.setBackgroundResource(R.drawable.round_button_layout_white);
                     /*addItem.setVisibility(View.VISIBLE);
                     decrement.setVisibility(View.GONE);
                     increment.setVisibility(View.GONE);

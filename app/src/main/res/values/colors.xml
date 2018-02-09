@@ -5,7 +5,7 @@
     <color name="colorAccent">#f44336</color>
     <color name="background">#121212</color>
     <color name="text">#fff</color>
-    <color name="hint">#424242</color>
+    <color name="hint">#828282</color>
     <color name="activeIcons">#fff</color>
     <color name="inactiveIcons">#424242</color>
 </resources>

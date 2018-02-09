@@ -3,42 +3,61 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="@color/background"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_vertical">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="100">
+        android:weightSum="100"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp">
         <TextView
             android:id="@+id/item_name"
-            android:layout_width="wrap_content"
+            android:layout_weight="50"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:text="Paneer"
-            android:layout_weight="40"
+            android:textSize="18sp"
+            android:text="Tuborg"
+            android:layout_gravity="center_vertical"
+            android:textColor="#FFF"
             />
         <TextView
             android:id="@+id/item_price"
-            android:layout_width="wrap_content"
+            android:layout_weight="15"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text="200"
-            android:layout_weight="20"
+            android:textSize="18sp"
+            android:textAlignment="center"
+            android:textColor="@color/hint"
+            android:layout_gravity="center_vertical"
             />
         <TextView
             android:id="@+id/item_quantity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_weight="15"
+            android:layout_width="0dp"
+            android:textColor="@color/hint"
             android:text="2"
-            android:layout_weight="20"
-            />
+            android:textSize="18sp"
+            android:textAlignment="textEnd"
+            android:layout_gravity="center_vertical"
+            android:layout_height="wrap_content" />
         <TextView
             android:id="@+id/item_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="20"
-            android:text="400"/>
+            android:textSize="18sp"
+            android:textAlignment="textEnd"
+            android:layout_gravity="center_vertical"
+            android:textColor="#FFF"/>
     </LinearLayout><!--
     <LinearLayout
         android:layout_width="wrap_content"
@@ -51,4 +70,5 @@
         android:layout_height="wrap_content">
     </ListView>
     </LinearLayout>-->
+</RelativeLayout>
 </LinearLayout>

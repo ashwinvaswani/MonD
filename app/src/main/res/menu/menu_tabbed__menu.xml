@@ -14,4 +14,8 @@
         android:title="Offers"
         android:orderInCategory="100"
         app:showAsAction="never" />
+    <item android:id="@+id/action_signout"
+        android:title="Sign Out"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
 </menu>

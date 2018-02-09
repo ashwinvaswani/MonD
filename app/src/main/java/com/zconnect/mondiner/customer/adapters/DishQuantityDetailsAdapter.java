@@ -26,14 +26,13 @@ public class DishQuantityDetailsAdapter extends RecyclerView.Adapter<QuantityDet
     @Override
     public QuantityDetailsViewholder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        View newView = layoutInflater.inflate(R.layout.item_cart_user_confirm, parent, false);
+        View newView = layoutInflater.inflate(R.layout.item_quantity_details, parent, false);
         return new QuantityDetailsViewholder(newView);
     }
 
     @Override
     public void onBindViewHolder(QuantityDetailsViewholder holder, int position) {
-        holder.userName.setText(userData.get(position).getUserName());
-        holder.userQuantity.setText(userData.get(position).getUserQuantity());
+        holder.populate(userData.get(position));
     }
 
     @Override

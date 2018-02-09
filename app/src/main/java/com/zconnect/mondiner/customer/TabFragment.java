@@ -86,7 +86,7 @@ public class TabFragment extends Fragment {
         //TODO : Change all hard coded stuff
         mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("dishes").orderByChild("category").equalTo(tabInfo.getCatName());
         mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child("redChillies").child("table").child(Details.TABLE_ID).child("currentOrder")/*.child("dishes")*/.child("cart");
-        menuAdapter = new MenuAdapter(menus, dishIDs);
+        menuAdapter = new MenuAdapter(menus, dishIDs, getResources().getString(R.string.Rs), getContext());
         indianMenu.setAdapter(menuAdapter);
         return rootView;
     }
@@ -113,6 +113,12 @@ public class TabFragment extends Fragment {
                             m.setItemName(childSnapshot.child("name").getValue(String.class));
                             m.setItemPrice(childSnapshot.child("price").getValue(String.class));
                             m.setVegNonVeg(childSnapshot.child("type").getValue(String.class));
+                            if(childSnapshot.child("image").getValue(String.class)!=null) {
+                                m.setImageUri(childSnapshot.child("image").getValue(String.class));
+                            }
+                            else{
+                                m.setImageUri("");
+                            }
                             menus.add(m);
                         }
                     }

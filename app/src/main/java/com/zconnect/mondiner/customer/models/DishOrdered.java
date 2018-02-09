@@ -52,7 +52,12 @@ public class DishOrdered {
     }
 
     public String getDishQuantity() {
-        return dishQuantity;
+        if(dishQuantity!=null) {
+            return dishQuantity;
+        }
+        else {
+            return "0";
+        }
     }
 
     public void setDishQuantity(String dishQuantity) {

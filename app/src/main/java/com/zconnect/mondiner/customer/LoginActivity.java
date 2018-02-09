@@ -219,7 +219,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            Log.e("LoginActivity -- ","User Id is : "+mAuth.getCurrentUser().getUid());
+                            Log.e("LoginActivity -- ","User Id isd : "+mAuth.getCurrentUser().getUid());
                             preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                             SharedPreferences.Editor editor = preferences.edit();
                             editor.putString("userID",""+ mAuth.getCurrentUser().getUid());

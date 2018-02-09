@@ -1,5 +1,6 @@
 package com.zconnect.mondiner.customer.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,8 +20,10 @@ import java.util.ArrayList;
 public class CartAdapter extends RecyclerView.Adapter<CartViewholder> {
 
     private ArrayList<DishOrdered> dishitems;
-    public CartAdapter(ArrayList<DishOrdered> dishArray)    {
+    private Context context;
+    public CartAdapter(ArrayList<DishOrdered> dishArray, Context context)    {
         dishitems = dishArray;
+        this.context = context;
     }
 
     @Override
@@ -33,10 +36,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewholder> {
     }
 
     public void onBindViewHolder(final CartViewholder holder, final int position) {
-        holder.itemNametv.setText(dishitems.get(position).getDishName());
-        holder.itemQuantitytv.setText(dishitems.get(position).getDishQuantity());
-        holder.itemPricetv.setText(dishitems.get(position).getDishPrice());
-        holder.itemAmounttv.setText(dishitems.get(position).getDishAmount());
+        holder.populate(dishitems.get(position), context);
         //TODO : Implement onClick item thing
         holder.openItem(dishitems.get(position).getDishID());
         //int amount = Integer.parseInt(dishitems.get(position).getDishPrice())*Integer.parseInt(dishitems.get(position).getDishQuantity());

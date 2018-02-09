@@ -50,6 +50,7 @@ public class DishQuantityDetails extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.getValue(String.class)!=null) {
+
                                     cartUserData.setUserQuantity(dataSnapshot.getValue(String.class));
                                     userData.add(cartUserData);
              //                       dishQuantityDetailsAdapter = new DishQuantityDetailsAdapter(userData);
