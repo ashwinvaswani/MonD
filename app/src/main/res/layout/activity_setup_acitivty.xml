@@ -11,35 +11,43 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <ImageButton
-        android:id="@+id/setupImgBtn"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:paddingTop="20dp"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/c245339439045212"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="126dp"
-        tools:layout_editor_absoluteY="16dp"
-        />
+        <ImageButton
+            android:id="@+id/setupImgBtn"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:paddingTop="20dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/c245339439045212"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteX="126dp"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="30dp"
-        tools:layout_editor_absoluteY="142dp"
-        android:id="@+id/setupNameField"
-        tools:ignore="MissingConstraints"
-        android:hint="Display Name..."/>
+        <EditText
+            android:id="@+id/setupNameField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Display Name"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteX="30dp"
+            tools:layout_editor_absoluteY="142dp" />
 
-    <Button
-        android:id="@+id/submitButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="447dp"
-        tools:ignore="MissingConstraints"
-        android:text="FINISH SETUP"/>
+        <EditText
+            android:id="@+id/contact_no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Contact Number"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteX="30dp"
+            tools:layout_editor_absoluteY="142dp" />
+
+        <Button
+            android:id="@+id/submitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FINISH SETUP"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteX="148dp"
+            tools:layout_editor_absoluteY="447dp" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

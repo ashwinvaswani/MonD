@@ -20,7 +20,7 @@ import com.zconnect.mondiner.customer.models.DishOrdered;
 import com.zconnect.mondiner.customer.utils.Details;
 
 /**
- * Created by Ishaan on 21-01-2018.
+ * Created on 21-01-2018.
  */
 
 public class CartViewholder extends RecyclerView.ViewHolder {

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/offer_image"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="fitXY" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/lin"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="100">
+                <TextView
+                    android:id="@+id/offer_title"
+                    android:layout_weight="100"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:text="Title"
+                    android:layout_below="@id/offer_image"
+                    android:textColor="@color/text"
+                    android:textSize="24sp" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/offer_information"
+                android:layout_below="@+id/lin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text"
+                android:text="Description"
+                android:textSize="16sp"
+                />
+
+</LinearLayout>

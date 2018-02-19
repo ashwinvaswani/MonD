@@ -54,6 +54,33 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences preferences;
     private String user_id = "";
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private String googleName;
+    private String googleMail;
+    private int counter;
+   /* private ValueEventListener valueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            counter =0;
+            for (DataSnapshot users : dataSnapshot.getChildren()) {
+                if (users.getKey().equals(mAuth.getCurrentUser().getUid())) {
+                    counter = counter+1;
+                    break;
+                }
+            }
+            if(counter ==0){
+                mDatabaseUsers.child(mAuth.getCurrentUser().getUid().toString()).child("name").setValue(googleName);
+                mDatabaseUsers.child(mAuth.getCurrentUser().getUid().toString()).child("email").setValue(googleMail);
+                Intent setupIntent = new Intent(LoginActivity.this, SetupAcitivty.class);
+                //setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(setupIntent);
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,17 +94,17 @@ public class LoginActivity extends AppCompatActivity {
 
         mProgress = new ProgressDialog(this);
 
-        mEmailField = (EditText) findViewById(R.id.emailField);
-        mPasswordField = (EditText) findViewById(R.id.passwordField);
+        mEmailField = (EditText) findViewById(R.id.emailFieldLogin);
+        mPasswordField = (EditText) findViewById(R.id.passwordFieldLogin);
         mSignInBtn = (Button) findViewById(R.id.SignIn);
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if(firebaseAuth.getCurrentUser()!=null){
+                /*if(firebaseAuth.getCurrentUser()!=null){
                     Intent home = new Intent(LoginActivity.this, QR_Offers_prevOrders.class);
                     startActivity(home);
-                }
+                }*/
             }
         };
 
@@ -154,14 +181,42 @@ public class LoginActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                    if(task.isSuccessful()){
                        mProgress.dismiss();
-                       CheckUserExist();
+                       //CheckUserExist();
+                       mDatabaseUsers.addValueEventListener(new ValueEventListener() {
+                           @Override
+                           public void onDataChange(DataSnapshot dataSnapshot) {
+                               for(DataSnapshot users : dataSnapshot.getChildren()){
+                                   if(users.getKey().toString().equalsIgnoreCase(mAuth.getCurrentUser().getUid().toString())){
+                                       String name = users.child("Username").getValue(String.class);
+                                       preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                                       SharedPreferences.Editor editor = preferences.edit();
+                                       editor.putString("userID",""+ mAuth.getCurrentUser().getUid());
+                                       editor.putString("username",""+name);
+                                       Log.e("LoginActivity", "ID : "+ mAuth.getCurrentUser().getUid() + "name : " + name);
+                                       editor.apply();
+                                   }
+                               }
+                           }
+
+                           @Override
+                           public void onCancelled(DatabaseError databaseError) {
+
+                           }
+                       });
+                       Intent setupIntent = new Intent(LoginActivity.this, TabbedMenu.class);
+                       //setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                       startActivity(setupIntent);
+
                    }
                    else{
                        mProgress.dismiss();
-                       Toast.makeText(LoginActivity.this, "Error Signing In through EMail",Toast.LENGTH_LONG).show();
+                           Toast.makeText(LoginActivity.this, "Invalid Sign-in",Toast.LENGTH_LONG).show();
                    }
                 }
             });
+        }
+        else{
+            Toast.makeText(this, "Provide a valid e-mail and password", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -225,8 +280,16 @@ public class LoginActivity extends AppCompatActivity {
                             editor.putString("userID",""+ mAuth.getCurrentUser().getUid());
                             editor.putString("username",""+account.getDisplayName());
                             editor.apply();
-                            mDatabaseUsers.child(mAuth.getCurrentUser().getUid().toString()).child("name").setValue(account.getDisplayName());
-                            mDatabaseUsers.child(mAuth.getCurrentUser().getUid().toString()).child("email").setValue(account.getEmail());
+                            Intent setupIntent = new Intent(LoginActivity.this, TabbedMenu.class);
+                            startActivity(setupIntent);
+                            /*googleName = account.getDisplayName();
+                            googleMail = account.getEmail();*/
+                            /*mDatabaseUsers.addValueEventListener(valueEventListener);
+                            if(counter ==1){
+                                Intent setupIntent = new Intent(LoginActivity.this, TabbedMenu.class);
+                                //setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(setupIntent);
+                            }*/
                             mProgress.dismiss();
 
                         } else {
@@ -263,28 +326,23 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });*/
 
-
+/*
     private void CheckUserExist() {
-        if(mAuth.getCurrentUser() != null){
+
             user_id = mAuth.getCurrentUser().getUid();
             mDatabaseUsers.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.hasChild(user_id)){
-                        /*Details.USER_ID = user_id;
+                        *//*Details.USER_ID = user_id;
                         Log.e("LoginActivity","user_id : " + user_id+" USER_ID (Details) : "+Details.USER_ID);
-                        sharedPreferences();*/
-                        Intent setupIntent = new Intent(LoginActivity.this, QR_Offers_prevOrders.class);
+                        sharedPreferences();*//*
+                        Intent setupIntent = new Intent(LoginActivity.this, TabbedMenu.class);
                         setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(setupIntent);
                     }
                     else{
-//                        setupUserDataAndFinish(mAuth.getCurrentUser());
-                        /*Details.USER_ID = user_id;
-                        sharedPreferences();*/
-                        Intent setupIntent = new Intent(LoginActivity.this, SetupAcitivty.class);
-                        setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(setupIntent);
+                        Toast.makeText(LoginActivity.this, "Please register first", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -293,8 +351,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 }
             });
-        }
-    }
+    }*/
 
     @Override
     protected void onStart() {
@@ -302,11 +359,17 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(mAuthListener);
     }
 
-//TODO : Remove the onStart intent jump
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //mDatabaseUsers.removeEventListener(valueEventListener);
+    }
+
+    //TODO : Remove the onStart intent jump
 //    @Override
 //    protected void onStart() {
 //        super.onStart();
-//        Intent tomenu = new Intent(LoginActivity.this, Tabbed_Menu.class);
+//        Intent tomenu = new Intent(LoginActivity.this, TabbedMenu.class);
 //        tomenu.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        startActivity(tomenu);
 //    }

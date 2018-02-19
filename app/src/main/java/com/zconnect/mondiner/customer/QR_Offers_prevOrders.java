@@ -6,10 +6,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,7 +24,6 @@ import com.zconnect.mondiner.customer.utils.Details;
 
 public class QR_Offers_prevOrders extends AppCompatActivity {
 
-    private TextView mTextMessage;
     private IntentIntegrator qrScan;
 
     private DatabaseReference mUserName;
@@ -38,16 +37,20 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             switch (item.getItemId()) {
                 case R.id.navigation_offers:
-                    mTextMessage.setText("Offers");
+                    fragmentTransaction.replace(R.id.fragmentContainer, new OffersFragment()).commit();
                     return true;
                 case R.id.navigation_scanQR: {
+                    //fragmentTransaction.replace(R.id.fragmentContainer, new QRFragment()).commit();
+                    //qrScan.forSupportFragment( new QRFragment()).initiateScan();
                     qrScan.initiateScan();
                     return true;
                 }
                 case R.id.navigation_previousOrders:
-                    mTextMessage.setText("Previous Orders");
+                    fragmentTransaction.replace(R.id.fragmentContainer, new PrevOrdersFragment()).commit();
                     return true;
             }
             return false;
@@ -60,12 +63,14 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
         setContentView(R.layout.qr_offers_prevorders);
         qrScan = new IntentIntegrator(this);
         mRefRestID = FirebaseDatabase.getInstance().getReference().child("restaurants");
-        mTextMessage = (TextView) findViewById(R.id.message);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String userID = preferences.getString("userID", "");
         String username = preferences.getString("username","");
         Details.USER_ID = userID;
         Details.USERNAME = username;
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragmentContainer, new QRFragment()).commit();
         Log.e("QR_Offers_prevOrders --","User ID is : "+Details.USER_ID + "Username is : "+ Details.USERNAME);
         /*SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String userid = preferences.getString("UserID","");
@@ -111,19 +116,22 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
             if (result.getContents() == null) {
                 Toast.makeText(this, "QR not scanned", Toast.LENGTH_LONG).show();
             } else {
-                //Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-                Log.e("QrActivity", "QR Scanned = " + result.getContents());
-                String information[] = result.getContents().split(";");
-                String RestID = information[0].trim();
-                String TableID = information[1].trim();
-                preferencesQRData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = preferencesQRData.edit();
-                editor.putString("restaurantId", RestID);
-                editor.putString("currentTableId",TableID);
-                editor.apply();
-                Log.e("QrActivity", "Table : " + information[1].trim());
-                checkRestId(RestID, TableID);
-
+                try {//Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                    Log.e("QrActivity", "QR Scanned = " + result.getContents());
+                    String information[] = result.getContents().split(";");
+                    String RestID = information[0].trim();
+                    String TableID = information[1].trim();
+                    preferencesQRData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    SharedPreferences.Editor editor = preferencesQRData.edit();
+                    editor.putString("restaurantId", RestID);
+                    editor.putString("currentTableId", TableID);
+                    editor.apply();
+                    Log.e("QrActivity", "Table : " + information[1].trim());
+                    checkRestId(RestID, TableID);
+                }
+                catch (Exception e){
+                    Toast.makeText(this, "Data cannot be processed", Toast.LENGTH_SHORT).show();
+                }
                 //info 0 RestID and info 1 has TableID
             }
         } else {
@@ -188,7 +196,7 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
                 Details.TABLE_ID = currentTableId;
                 Log.e("QRActivity","Checking shared preferences : " + Details.REST_ID + "--" + Details.TABLE_ID);
                 mRefRestID.child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("availability").setValue("false");
-                Intent tomain = new Intent(QR_Offers_prevOrders.this, Tabbed_Menu.class);
+                Intent tomain = new Intent(QR_Offers_prevOrders.this, TabbedMenu.class);
                 Toast.makeText(this, "Please select your dishes...", Toast.LENGTH_SHORT).show();
                 mRefRestID.removeEventListener(restListener);
                 startActivity(tomain);
@@ -202,7 +210,7 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();/*
-        Intent tomain = new Intent(QR_Offers_prevOrders.this, Tabbed_Menu.class);
+        Intent tomain = new Intent(QR_Offers_prevOrders.this, TabbedMenu.class);
         tomain.putExtra("rest_id", "redChillies");
         tomain.putExtra("table_id", "redChilliesTable_03");
         startActivity(tomain);*/

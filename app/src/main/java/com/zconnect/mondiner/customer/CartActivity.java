@@ -2,6 +2,7 @@ package com.zconnect.mondiner.customer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.Sampler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +31,9 @@ import java.util.ArrayList;
 public class CartActivity extends AppCompatActivity {
 
     private DatabaseReference mCurrentOrderRef;
+    private ValueEventListener mCurrentOrderCartListener;
+    private ValueEventListener mCurrentOrderUsersListener;
+    private ValueEventListener mAllUsersListener;
     private DatabaseReference mTableRef;
     private RecyclerView cartContent;
     private RecyclerView cartUserDatarv;
@@ -37,7 +41,7 @@ public class CartActivity extends AppCompatActivity {
     private DatabaseReference mDishRef;
     private CartAdapter cartAdapter;
     private UserConfirmationAdapter userConfirmationAdapter;
-    ArrayList<CartUserData> userData = new ArrayList<>();
+    private ArrayList<CartUserData> userData = new ArrayList<>();
     private ArrayList<DishOrdered> dishitems = new ArrayList<>();
     private int dishAmount;
     private String dishPrice;
@@ -47,7 +51,7 @@ public class CartActivity extends AppCompatActivity {
     private int amount = 0;
     private TextView noItemCart;
     private long size=0;
-    int counter=0;
+    private int counter=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,14 +77,15 @@ public class CartActivity extends AppCompatActivity {
         cartUserDatarv.setAdapter(userConfirmationAdapter);
         totalAmount = findViewById(R.id.total_text);
         mCurrentOrderRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
-                .child(Details.TABLE_ID).child("currentOrder");
+                .child(Details.TABLE_ID);
 
         cartAdapter = new CartAdapter(dishitems, getApplicationContext());
         cartContent.setAdapter(cartAdapter);
 
         dishAmount = 0;
         //TODO : Handle null exceptions from firebase
-        mCurrentOrderRef.child("cart").addValueEventListener(new ValueEventListener() {
+
+        mCurrentOrderCartListener  =new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 dishitems.clear();
@@ -116,8 +121,9 @@ public class CartActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
+        };
+        mCurrentOrderRef.child("currentOrder").child("cart").addValueEventListener(mCurrentOrderCartListener);
 
-        });
         /*mCurrentOrderRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
             @   Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -142,10 +148,9 @@ public class CartActivity extends AppCompatActivity {
         });*/
         cartUserDatarv.setVisibility(View.GONE);
         confirmOrder.setVisibility(View.VISIBLE);
-        mCurrentOrderRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
+        mCurrentOrderUsersListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
                 userData.clear();
                 for (DataSnapshot userID : dataSnapshot.getChildren()) {
                     final CartUserData cartUserData = new CartUserData();
@@ -165,29 +170,30 @@ public class CartActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
+        mCurrentOrderRef.child("currentOrder").child("activeUsers").addValueEventListener(mCurrentOrderUsersListener);
 
         confirmOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCurrentOrderRef.child("activeUsers").child(Details.USER_ID).child("confirmStatus").setValue("yes");
+                mCurrentOrderRef.child("currentOrder").child("activeUsers").child(Details.USER_ID).child("confirmStatus").setValue("yes");
 //              userConfirmationAdapter.notifyDataSetChanged();
                 confirmOrder.setVisibility(View.GONE);
                 cartUserDatarv.setVisibility(View.VISIBLE);
             }
         });
 
-        mCurrentOrderRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
+        mAllUsersListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 int flag=0;
                 for(DataSnapshot user : dataSnapshot.getChildren()){
-                        if(user.child("confirmStatus").getValue(String.class).equalsIgnoreCase("no")){
+                    if(user.child("confirmStatus").getValue(String.class).equalsIgnoreCase("no")){
                         flag=1;
                     }
                 }
                 if(flag==0){
-                    mCurrentOrderRef.child("orderConfirmation").setValue("yes");
+                    mCurrentOrderRef.child("confirmStatus").setValue("false");
                     Toast.makeText(CartActivity.this, "Order confirmed by all users.", Toast.LENGTH_SHORT).show();
                     Intent setupIntent = new Intent(CartActivity.this, ConfirmationActivity .class);
                     setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -199,7 +205,9 @@ public class CartActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
+
+        mCurrentOrderRef.child("currentOrder").child("activeUsers").addValueEventListener(mAllUsersListener);
 
     }
 
@@ -211,6 +219,13 @@ public class CartActivity extends AppCompatActivity {
         startActivity(setupIntent);*/
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mCurrentOrderRef.child("currentOrder").child("cart").removeEventListener(mCurrentOrderCartListener);
+        mCurrentOrderRef.child("currentOrder").child("activeUsers").removeEventListener(mCurrentOrderUsersListener);
+        mCurrentOrderRef.child("currentOrder").child("activeUsers").removeEventListener(mAllUsersListener);
+    }
 }
 
 

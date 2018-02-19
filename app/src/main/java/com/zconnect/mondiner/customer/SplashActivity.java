@@ -12,7 +12,7 @@ public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        //setContentView(R.layout.activity_splash);
         new Handler().postDelayed(new Runnable() {
 
             /*
@@ -24,7 +24,7 @@ public class SplashActivity extends Activity {
             public void run() {
                 // This method will be executed once the timer is over
                 // Start your app main activity
-                Intent i = new Intent(SplashActivity.this, Tabbed_Menu.class);
+                Intent i = new Intent(SplashActivity.this, TabbedMenu.class);
                 startActivity(i);
 
                 // close this activity

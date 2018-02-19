@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
         android:id="@+id/navigation_offers"
         android:icon="@drawable/ic_offers"
         android:title="Offers" />
-
     <item
         android:id="@+id/navigation_scanQR"
         android:icon="@drawable/ic_qr_scan"
         android:title="Scan QR" />
-
     <item
         android:id="@+id/navigation_previousOrders"
         android:icon="@drawable/ic_prev_orders"

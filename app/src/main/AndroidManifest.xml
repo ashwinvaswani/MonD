@@ -30,30 +30,36 @@
         <activity
             android:name=".LoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Register_Activity" />
-        <activity android:name=".SetupAcitivty" />
+        <activity android:name=".Register_Activity"></activity>
+        <activity android:name=".SetupAcitivty"></activity>
         <activity
             android:name=".QR_Offers_prevOrders"
             android:label="QRActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Tabbed_Menu"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity android:name=".CartActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity android:name=".ConfirmationActivity" />
+            android:name=".TabbedMenu"
+            android:label="monDiner"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".CartActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".ConfirmationActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".DishQuantityDetails" />
         <activity android:name=".PreviousOrdersActivity" />
-        <activity android:name=".SplashActivity"
+        <activity
+            android:name=".SplashActivity"
             android:label="monDiner"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/SplashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".OffersActivity"></activity>
     </application>
 
 </manifest>

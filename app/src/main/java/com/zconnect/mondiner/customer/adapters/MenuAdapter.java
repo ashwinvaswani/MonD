@@ -25,7 +25,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuViewHolder> {
     private String rsSymbol;
     private  Context context;
     public MenuAdapter(ArrayList<Menu> menuArray, ArrayList<String> dishIDs, String rsSymbol, Context context) {
-        menus = menuArray;
+        this.menus = menuArray;
         this.dishIDs = dishIDs;
         this.rsSymbol = rsSymbol;
         this.context = context;

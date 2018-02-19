@@ -20,6 +20,7 @@ import com.zconnect.mondiner.customer.adapters.MenuAdapter;
 import com.zconnect.mondiner.customer.models.Menu;
 import com.zconnect.mondiner.customer.models.Tabs;
 import com.zconnect.mondiner.customer.utils.Details;
+import com.zconnect.mondiner.customer.utils.FirebasePersistence;
 
 import java.util.ArrayList;
 
@@ -31,6 +32,7 @@ public class TabFragment extends Fragment {
     private Tabs tabInfo = new Tabs();
 
     private com.google.firebase.database.Query mMenuRef;
+    private ValueEventListener mMenuRefListener;
     private DatabaseReference mTableRef;
     private ValueEventListener tableListener = new ValueEventListener() {
         @Override
@@ -85,7 +87,7 @@ public class TabFragment extends Fragment {
 
         //TODO : Change all hard coded stuff
         mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("dishes").orderByChild("category").equalTo(tabInfo.getCatName());
-        mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child("redChillies").child("table").child(Details.TABLE_ID).child("currentOrder")/*.child("dishes")*/.child("cart");
+        mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("currentOrder")/*.child("dishes")*/.child("cart");
         menuAdapter = new MenuAdapter(menus, dishIDs, getResources().getString(R.string.Rs), getContext());
         indianMenu.setAdapter(menuAdapter);
         return rootView;
@@ -95,7 +97,7 @@ public class TabFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mMenuRef.addValueEventListener(new ValueEventListener() {
+        mMenuRefListener = new ValueEventListener() {
             @SuppressWarnings("ConstantConditions")
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -113,17 +115,41 @@ public class TabFragment extends Fragment {
                             m.setItemName(childSnapshot.child("name").getValue(String.class));
                             m.setItemPrice(childSnapshot.child("price").getValue(String.class));
                             m.setVegNonVeg(childSnapshot.child("type").getValue(String.class));
-                            if(childSnapshot.child("image").getValue(String.class)!=null) {
+                            m.setAvailability(true);
+                            if (childSnapshot.child("image").getValue(String.class) != null) {
                                 m.setImageUri(childSnapshot.child("image").getValue(String.class));
-                            }
-                            else{
+                            } else {
                                 m.setImageUri("");
                             }
                             menus.add(m);
                         }
                     }
-                    catch (Exception e){
-                        Log.e("TabFragment",""+e);
+                    catch (Exception e) {
+                        Log.e("TabFragment", "" + e);
+                    }
+                }
+                for (final DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    try {
+                        if (childSnapshot.child("name").exists() &&
+                                childSnapshot.child("price").exists() &&
+                                childSnapshot.child("type").exists() &&
+                                childSnapshot.child("availability").getValue(String.class).equalsIgnoreCase("false")) {
+                            Menu m = new Menu();
+                            dishIDs.add(childSnapshot.getKey());
+                            m.setItemName(childSnapshot.child("name").getValue(String.class));
+                            m.setItemPrice(childSnapshot.child("price").getValue(String.class));
+                            m.setVegNonVeg(childSnapshot.child("type").getValue(String.class));
+                            m.setAvailability(false);
+                            if (childSnapshot.child("image").getValue(String.class) != null) {
+                                m.setImageUri(childSnapshot.child("image").getValue(String.class));
+                            } else {
+                                m.setImageUri("");
+                            }
+                            menus.add(m);
+                        }
+                    }
+                    catch (Exception e) {
+                        Log.e("TabFragment", "" + e);
                     }
                 }
                 if (menus.size() != 0) {
@@ -137,14 +163,16 @@ public class TabFragment extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("TabFragment", "on cancelled" + databaseError.toString());
             }
-        });
+        };
+        mMenuRef.addValueEventListener(mMenuRefListener);
 
     }
 
     @Override
     public void onPause() {
-        mTableRef.removeEventListener(tableListener);
         super.onPause();
+        mTableRef.removeEventListener(tableListener);
+        mMenuRef.removeEventListener(mMenuRefListener);
     }
 }
 

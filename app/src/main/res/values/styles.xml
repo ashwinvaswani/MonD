@@ -17,6 +17,9 @@
         <item name="windowActionBar">false</item>
     </style>
 
+    <style name="SplashScreenTheme" parent="AppTheme.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_layer</item>
+    </style>
 
     <style name="Theme.MyFancyTheme" parent="android:Theme.Holo">
         <item name="android:homeAsUpIndicator">@drawable/logo</item>

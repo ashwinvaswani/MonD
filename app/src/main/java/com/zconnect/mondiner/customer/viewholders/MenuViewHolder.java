@@ -1,6 +1,7 @@
 package com.zconnect.mondiner.customer.viewholders;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -88,6 +89,17 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
             increment.setBackgroundResource(R.drawable.round_button_layout);
             decrement.setBackgroundResource(R.drawable.round_button_layout);
             itemNametv.setTextColor(context.getResources().getColor(R.color.colorAccent));
+        }
+        if(!menu.getAvailability()){
+            Log.e("MenuViewHold","Name : "+menu.getItemName()+"Availability : "+menu.getAvailability());
+            itemNametv.setTextColor(context.getResources().getColor(R.color.hint));
+            quantityDisplay.setTextColor(context.getResources().getColor(R.color.hint));
+            increment.setEnabled(false);
+            decrement.setEnabled(false);
+            increment.setBackgroundResource(R.drawable.round_button_disabled_layout);
+            decrement.setBackgroundResource(R.drawable.round_button_disabled_layout);
+            increment.setTextColor(context.getResources().getColor(R.color.hint));
+            decrement.setTextColor(context.getResources().getColor(R.color.hint));
         }
         //addItem.setOnClickListener(this);
     }

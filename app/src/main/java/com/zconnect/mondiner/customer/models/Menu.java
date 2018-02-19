@@ -74,7 +74,7 @@ public class Menu {
         this.vegNonVeg = vegNonVeg;
     }
 
-    public boolean isAvailability() {
+    public boolean getAvailability() {
         return availability;
     }
 

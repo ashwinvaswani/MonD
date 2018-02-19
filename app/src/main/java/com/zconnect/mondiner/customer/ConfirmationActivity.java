@@ -2,6 +2,7 @@ package com.zconnect.mondiner.customer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +27,7 @@ public class ConfirmationActivity extends AppCompatActivity {
 
     private RecyclerView cartContent;
     private DatabaseReference mTableRef;
+    private ValueEventListener mTableRefListener;
     private DatabaseReference mDataRef;
     private CartAdapter cartAdapter;
     private ArrayList<DishOrdered> dishitems = new ArrayList<>();
@@ -41,6 +43,12 @@ public class ConfirmationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirmation);
+
+        android.support.v7.widget.Toolbar toolbar =  findViewById(R.id.cart_toolbar);
+        setSupportActionBar(toolbar);
+        //TODO : Align the toolbar text to centre
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.center_text_bill_title);
         cartContent = findViewById(R.id.order_confirm_rv);
         totalAmount = findViewById(R.id.confirm_total_amount);
         callWaiter = findViewById(R.id.call_waiter);
@@ -54,11 +62,10 @@ public class ConfirmationActivity extends AppCompatActivity {
         cartContent.setAdapter(cartAdapter);
         dishAmount = 0;
         //TODO : Handle null exceptions from firebase
-        mTableRef.child("cart").addValueEventListener(new ValueEventListener() {
+        mTableRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 dishitems.clear();
-
                 for (final DataSnapshot dishid : dataSnapshot.getChildren()) {
                     final DishOrdered dishOrdered = new DishOrdered();
                     try {
@@ -73,7 +80,7 @@ public class ConfirmationActivity extends AppCompatActivity {
                             amount += dishAmount;
                             Log.e("amount : ", "" + amount);
                             dishitems.add(dishOrdered);
-                            totalAmount.setText(amount + "");
+                            totalAmount.setText(getResources().getString(R.string.Rs)+amount);
                         }
                     }
                     catch (Exception e){
@@ -82,18 +89,19 @@ public class ConfirmationActivity extends AppCompatActivity {
                 }
                 cartAdapter.notifyDataSetChanged();
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-
-        });
+        };
+        mTableRef.child("cart").addValueEventListener(mTableRefListener);
 
         callWaiter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mDataRef.child("callWaiter").setValue("true");
-                Toast.makeText(ConfirmationActivity.this, "Please wait! Waiter coming...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ConfirmationActivity.this, "Please wait! Waiter will attend you.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -101,11 +109,16 @@ public class ConfirmationActivity extends AppCompatActivity {
         orderAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent toMenu = new Intent(ConfirmationActivity.this, Tabbed_Menu.class);
+                Intent toMenu = new Intent(ConfirmationActivity.this, TabbedMenu.class);
                 toMenu.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(toMenu);
             }
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mTableRef.child("cart").removeEventListener(mTableRefListener);
+    }
 }

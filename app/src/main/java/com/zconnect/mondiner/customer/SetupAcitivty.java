@@ -40,11 +40,12 @@ public class SetupAcitivty extends AppCompatActivity {
 
     private ImageButton mSetupImgBtn;
     private EditText mNameField;
+    private EditText mContact;
     private Button mSubmitBtn;
 
     private static final int GALLERY_REQUEST = 1;
 
-    private Uri mImageUri = null;
+    private Uri resultUri = null;
 
     private DatabaseReference mDatabaseUsers;
     private FirebaseAuth mAuth;
@@ -53,22 +54,27 @@ public class SetupAcitivty extends AppCompatActivity {
 
     private ProgressDialog mProgress;
     public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
-    private String name;
+    private String nick;
+    private String contact;
+    private String userID;
     private final int RC_PERM_REQ_EXT_STORAGE = 7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup_acitivty);
-
+        //TODO : Remove hard coded userID    *IMPORTANT*
+        mAuth = FirebaseAuth.getInstance();
+        userID = mAuth.getCurrentUser().getUid();
         mSetupImgBtn = (ImageButton) findViewById(R.id.setupImgBtn);
         mNameField = (EditText) findViewById(R.id.setupNameField);
+        mContact = findViewById(R.id.contact_no);
         mSubmitBtn = (Button) findViewById(R.id.submitButton);
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         mAuth = FirebaseAuth.getInstance();
         mProgress = new ProgressDialog(this);
 
-        mStorageImage = FirebaseStorage.getInstance().getReference().child("Profile_images");
+        mStorageImage = FirebaseStorage.getInstance().getReference().child("profile_images");
 
         mSubmitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,13 +88,13 @@ public class SetupAcitivty extends AppCompatActivity {
         mSetupImgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkPermissionREAD_EXTERNAL_STORAGE(SetupAcitivty.this)) {
+                //if (checkPermissionREAD_EXTERNAL_STORAGE(SetupAcitivty.this)) {
                     Intent galleryIntent = new Intent();
                     galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
                     galleryIntent.setType("image/*");
                     startActivityForResult(galleryIntent, GALLERY_REQUEST);
 
-                }
+                //}
             }
 
         });
@@ -97,34 +103,37 @@ public class SetupAcitivty extends AppCompatActivity {
 
     private void startSetupAccount() {
 
-        name = mNameField.getText().toString().trim();
-        final String user_id = mAuth.getCurrentUser().getUid();
+        nick = mNameField.getText().toString().trim();
+        contact = mContact.getText().toString().trim();
+        //final String user_id = mAuth.getCurrentUser().getUid();
 
-        if (!TextUtils.isEmpty(name) && mImageUri != null) {
+        if (!TextUtils.isEmpty(nick) && resultUri != null && !TextUtils.isEmpty(contact)) {
 
             mProgress.setMessage("Finishing Setup...");
             mProgress.show();
 
-            StorageReference filepath = mStorageImage.child(mImageUri.getLastPathSegment());
-            filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            StorageReference filepath = mStorageImage.child(resultUri.getLastPathSegment());
+            filepath.putFile(resultUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     Log.w("onSuccess", "Entered");
 
                     String downloadUri = taskSnapshot.getDownloadUrl().toString();
-
-                    mDatabaseUsers.child(user_id).child("name").setValue(name);
-                    mDatabaseUsers.child(user_id).child("image").setValue(downloadUri);
-
+                    mDatabaseUsers.child(userID).child("nick").setValue(nick);
+                    mDatabaseUsers.child(userID).child("image").setValue(downloadUri);
+                    mDatabaseUsers.child(userID).child("contact").setValue(contact);
                     mProgress.dismiss();
 
-                    Intent tomain = new Intent(SetupAcitivty.this, UnusedMainActivity.class);
+                    Intent tomain = new Intent(SetupAcitivty.this, TabbedMenu.class);
                     tomain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(tomain);
 
                 }
             });
 
+        }
+        else{
+            Toast.makeText(this, "Please fill in all details", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -150,31 +159,29 @@ public class SetupAcitivty extends AppCompatActivity {
 
 
                 try {
-                    mImageUri = result.getUri();
-                    if (mImageUri == null) {
+                    resultUri = result.getUri();
+                    mSetupImgBtn.setImageURI(resultUri);
+                    if (resultUri == null) {
                         Log.e("Setup Activity", "onActivityResult: got empty imageUri");
                         return;
                     }
-
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), mImageUri);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), resultUri);
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 10, out);
                     Bitmap bitmap2 = Bitmap.createScaledBitmap(bitmap, 200, 200, true);
-                    String path = MediaStore.Images.Media.insertImage(SetupAcitivty.this.getContentResolver(), bitmap2, mImageUri.getLastPathSegment(), null);
-                    mImageUri = Uri.parse(path);
-                    mSetupImgBtn.setImageURI(mImageUri);
+                    String path = MediaStore.Images.Media.insertImage(SetupAcitivty.this.getContentResolver(), bitmap2, resultUri.getLastPathSegment(), null);
+                    resultUri = Uri.parse(path);
+                    mSetupImgBtn.setImageURI(resultUri);
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+            }
+            else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
             }
         }
-
     }
-
 
     /*public boolean checkPermission() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
@@ -283,9 +290,10 @@ public class SetupAcitivty extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Intent setupIntent = new Intent(SetupAcitivty.this, QR_Offers_prevOrders.class);
+        //Log.e("SetupActivity", "User Id : " + mAuth.getCurrentUser().getUid().toString());
+        /*Intent setupIntent = new Intent(SetupAcitivty.this, QR_Offers_prevOrders.class);
         setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(setupIntent);
+        startActivity(setupIntent);*/
     }
 }
 
