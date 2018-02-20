@@ -61,7 +61,7 @@ public class CartViewholder extends RecyclerView.ViewHolder {
     public void populate(DishOrdered dishitems, Context context) {
         this.dishOrdered = dishitems;
         itemNametv.setText(dishitems.getDishName());
-        itemQuantitytv.setText(dishitems.getDishQuantity());
+        itemQuantitytv.setText(dishitems.getDishQuantity()+"");
         itemPricetv.setText(context.getResources().getString(R.string.Rs)+dishitems.getDishPrice());
         itemAmounttv.setText(context.getResources().getString(R.string.Rs)+dishitems.getDishAmount());
 

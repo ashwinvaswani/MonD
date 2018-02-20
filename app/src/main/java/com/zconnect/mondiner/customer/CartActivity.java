@@ -97,7 +97,7 @@ public class CartActivity extends AppCompatActivity {
                             dishOrdered.setDishID(dishid.getKey());
                             dishOrdered.setDishName(dishid.child("name").getValue(String.class));
                             dishOrdered.setDishPrice(dishid.child("price").getValue(String.class));
-                            dishOrdered.setDishQuantity(dishid.child("quantity").getValue(String.class));
+                            dishOrdered.setDishQuantity(Integer.parseInt(dishid.child("quantity").getValue(String.class)));
                             dishQuantity = Integer.parseInt(dishid.child("quantity").getValue(String.class));
                             dishAmount = Integer.parseInt(dishid.child("quantity").getValue(String.class)) * Integer.parseInt(dishid.child("price").getValue(String.class));
                             dishOrdered.setDishAmount(""+dishAmount);
@@ -225,6 +225,14 @@ public class CartActivity extends AppCompatActivity {
         mCurrentOrderRef.child("currentOrder").child("cart").removeEventListener(mCurrentOrderCartListener);
         mCurrentOrderRef.child("currentOrder").child("activeUsers").removeEventListener(mCurrentOrderUsersListener);
         mCurrentOrderRef.child("currentOrder").child("activeUsers").removeEventListener(mAllUsersListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();/*
+        mCurrentOrderRef.child("currentOrder").child("cart").addValueEventListener(mCurrentOrderCartListener);
+        mCurrentOrderRef.child("currentOrder").child("activeUsers").addValueEventListener(mCurrentOrderUsersListener);
+        mCurrentOrderRef.child("currentOrder").child("activeUsers").addValueEventListener(mAllUsersListener);*/
     }
 }
 

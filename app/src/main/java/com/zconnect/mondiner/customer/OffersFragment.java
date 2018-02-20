@@ -91,17 +91,20 @@ public class OffersFragment extends Fragment {
         mOffersRef = FirebaseDatabase.getInstance().getReference().child("restaurants");
         offersrv.setLayoutManager(new LinearLayoutManager(getContext()));
         offersAdapter = new OffersAdapter(offersArrayList);
+        offersrv.setAdapter(offersAdapter);
         mOfferListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 offersArrayList.clear();
-                for(DataSnapshot offers : dataSnapshot.child("offers").getChildren()){
-                    Log.e("OffersActivity","Datasnapshot" + dataSnapshot.toString());
-                    Offers o = new Offers();
-                    o.setOfferName(offers.child("title").getValue(String.class));
-                    o.setDescription(offers.child("description").getValue(String.class));
-                    o.setImageUri(offers.child("imageURL").getValue(String.class));
-                    offersArrayList.add(o);
+                for(DataSnapshot restaurants : dataSnapshot.getChildren()){
+                    for(DataSnapshot offers : restaurants.child("offers").getChildren()){
+                        Log.e("OffersActivity","Datasnapshot" + dataSnapshot.toString());
+                        Offers o = new Offers();
+                        o.setOfferName(offers.child("title").getValue(String.class));
+                        o.setDescription(offers.child("description").getValue(String.class));
+                        o.setImageUri(offers.child("imageURL").getValue(String.class));
+                        offersArrayList.add(o);
+                    }
                 }
                 offersrv.setAdapter(offersAdapter);
             }

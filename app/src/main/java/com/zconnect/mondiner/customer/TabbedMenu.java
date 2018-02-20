@@ -1,6 +1,5 @@
 package com.zconnect.mondiner.customer;
 
-import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -64,7 +63,6 @@ public class TabbedMenu extends AppCompatActivity {
     private ValueEventListener mRestRefListener;
     private DatabaseReference mTableRef;
     private SharedPreferences preferences;
-    private SharedPreferences preferencesQRData;
     private ProgressDialog mProgress;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseUsers;
@@ -90,10 +88,10 @@ public class TabbedMenu extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         Fresco.initialize(this);
         setContentView(R.layout.activity_tabbed__menu);
-        preferencesQRData = PreferenceManager.getDefaultSharedPreferences(this);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String restaurantId = preferencesQRData.getString("restaurantId", "");
-        String currentTableId = preferencesQRData.getString("currentTableId","");
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String restaurantId = preferences.getString("restaurantId", "");
+        String currentTableId = preferences.getString("currentTableId","");
         String userID = preferences.getString("userID", "");
         String username = preferences.getString("username","");
         Details.REST_ID = restaurantId;
@@ -126,7 +124,8 @@ public class TabbedMenu extends AppCompatActivity {
 
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
 
-        mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("currentOrder").child("activeUsers").child(Details.USER_ID);
+        mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
+                .child(Details.TABLE_ID).child("currentOrder").child("activeUsers").child(Details.USER_ID);
         mTableRef.child("name").setValue(Details.USERNAME);
         mTableRef.child("confirmStatus").setValue("no");
 
@@ -251,8 +250,16 @@ public class TabbedMenu extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_scan_qr) {
             Intent setupIntent = new Intent(TabbedMenu.this, QR_Offers_prevOrders.class);
-            setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            preferencesQRData.edit().clear();
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.remove("restaurantId");
+            editor.remove("currentTableId");
+            editor.commit();
+            Log.e("TabbedMenu","Shared Preferences Check --- UserID : "+preferences.getString("userID", "")
+                    +"username : "+preferences.getString("username", "")
+                    +"restID : "+preferences.getString("restaurantId", "")
+                    +"tableId : "+preferences.getString("currentTableId", ""));
+            Details.REST_ID = "";
+            Details.TABLE_ID = "";
             //onStart();
             startActivity(setupIntent);
             return true;
@@ -264,12 +271,21 @@ public class TabbedMenu extends AppCompatActivity {
         else if(id == R.id.action_signout){
             Intent setupIntent = new Intent(TabbedMenu.this, LoginActivity.class);
             //setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            preferences.edit().clear();
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.remove("userID");
+            editor.remove("username");
+            editor.remove("restaurantId");
+            editor.remove("currentTableId");
+            editor.commit();
+            Log.e("TabbedMenu","Shared Preferences Check --- UserID : "+preferences.getString("userID", "")
+                    +"username : "+preferences.getString("username", "")
+                    +"restID : "+preferences.getString("restaurantId", "")
+                    +"tableId : "+preferences.getString("currentTableId", ""));
             Details.USER_ID = "";
             Details.USERNAME = "";
             //Log.e("TabbedMenu","mAuth : "+mAuth.getCurrentUser().getUid());
             mAuth.signOut();
-            onStart();
+            //onStart();
             startActivity(setupIntent);
             return true;
         }
@@ -350,10 +366,14 @@ public class TabbedMenu extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 //        Log.e("TabbedMenu","UID : "+mAuth.getCurrentUser().getUid());
-        preferencesQRData = PreferenceManager.getDefaultSharedPreferences(this);
+        mAuth = FirebaseAuth.getInstance();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        final String restaurantId = preferencesQRData.getString("restaurantId", "");
-        final String currentTableId = preferencesQRData.getString("currentTableId","");
+        Log.e("TabbedMenu","Shared Preferences Check --- UserID : "+preferences.getString("userID", "")
+                +"username : "+preferences.getString("username", "")
+                +"restID : "+preferences.getString("restaurantId", "")
+                +"tableId : "+preferences.getString("currentTableId", ""));
+        final String restaurantId = preferences.getString("restaurantId", "");
+        final String currentTableId = preferences.getString("currentTableId","");
         String userID = preferences.getString("userID", "");
         String username = preferences.getString("username","");
         /*Intent tomain = new Intent(TabbedMenu.this, QR_Offers_prevOrders.class);
@@ -364,26 +384,27 @@ public class TabbedMenu extends AppCompatActivity {
             startActivity(tomain);
         }
         try {
-            if (!mAuth.getCurrentUser().getUid().equals(null)) {
                 mDatabaseUsersListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        int flag = 0;
-                        for (DataSnapshot users : dataSnapshot.getChildren()) {
-                            if (users.getKey().equals(mAuth.getCurrentUser().getUid())) {
-                                flag = 1;
-                                break;
+                        if (!mAuth.getCurrentUser().getUid().equals(null)) {
+                            int flag = 0;
+                            for (DataSnapshot users : dataSnapshot.getChildren()) {
+                                if (users.getKey().equals(mAuth.getCurrentUser().getUid())) {
+                                    flag = 1;
+                                    break;
+                                }
                             }
-                        }
-                        if (restaurantId.equals(null) || restaurantId.isEmpty() || currentTableId.equals(null) || currentTableId.isEmpty()) {
-                            Intent tomain = new Intent(TabbedMenu.this, QR_Offers_prevOrders.class);
-                            startActivity(tomain);
-                        }
+                            if (restaurantId.equals(null) || restaurantId.isEmpty() || currentTableId.equals(null) || currentTableId.isEmpty()) {
+                                Intent tomain = new Intent(TabbedMenu.this, QR_Offers_prevOrders.class);
+                                startActivity(tomain);
+                            }
                          /*if (flag == 0) {
                              Log.e("TabbedMenu", "In flag==0. Intent should open");
                              Intent toSetup = new Intent(TabbedMenu.this, SetupAcitivty.class);
                              startActivity(toSetup);
                          }*/
+                        }
                     }
 
                     @Override
@@ -392,7 +413,6 @@ public class TabbedMenu extends AppCompatActivity {
                     }
                 };
                 mDatabaseUsers.addValueEventListener(mDatabaseUsersListener);
-            }
         }
         catch (Exception e){
             Log.e("TabbedMenu","Error : " + e);
@@ -407,6 +427,13 @@ public class TabbedMenu extends AppCompatActivity {
         mMenuRef.removeEventListener(mMenuRefListener);
         mDatabaseUsers.removeEventListener(mDatabaseUsersListener);
         mRestRef.removeEventListener(mRestRefListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mMenuRef.addValueEventListener(mMenuRefListener);
+        mRestRef.addValueEventListener(mRestRefListener);
     }
 
     /**

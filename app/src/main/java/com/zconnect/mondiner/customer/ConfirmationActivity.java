@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,11 +24,14 @@ import com.zconnect.mondiner.customer.utils.Details;
 
 import java.util.ArrayList;
 
+import pl.droidsonroids.gif.GifImageView;
+
 public class ConfirmationActivity extends AppCompatActivity {
 
     private RecyclerView cartContent;
     private DatabaseReference mTableRef;
     private ValueEventListener mTableRefListener;
+    private ValueEventListener confirmStatusListener;
     private DatabaseReference mDataRef;
     private CartAdapter cartAdapter;
     private ArrayList<DishOrdered> dishitems = new ArrayList<>();
@@ -36,23 +40,39 @@ public class ConfirmationActivity extends AppCompatActivity {
     private int dishQuantity;
     private String quantity;
     private TextView totalAmount;
+    private TextView orderStatus;
     private int amount =0;
     private Button callWaiter;
     private Button orderAdd;
+    private LinearLayout amountLinear;
+    private TextView yourOrder;
+    //private GifImageView gif;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirmation);
-
-        android.support.v7.widget.Toolbar toolbar =  findViewById(R.id.cart_toolbar);
+        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.cart_toolbar);
         setSupportActionBar(toolbar);
+
         //TODO : Align the toolbar text to centre
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.center_text_bill_title);
+
         cartContent = findViewById(R.id.order_confirm_rv);
         totalAmount = findViewById(R.id.confirm_total_amount);
         callWaiter = findViewById(R.id.call_waiter);
         orderAdd = findViewById(R.id.order_add);
+        orderStatus = findViewById(R.id.order_status);
+        orderStatus.setText("Processing Order");
+        amountLinear = findViewById(R.id.amount_linear);
+        yourOrder = findViewById(R.id.your_order);
+
+
+        //orderAdd.setClickable(false);
+        //orderAdd.setBackgroundResource(R.color.hint);
+        /*gif = findViewById(R.id.loading_gif);
+        gif.setVisibility(View.VISIBLE);*/
+
         mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
                 .child(Details.TABLE_ID).child("currentOrder");
         mDataRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
@@ -66,25 +86,25 @@ public class ConfirmationActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 dishitems.clear();
+                amount=0;
                 for (final DataSnapshot dishid : dataSnapshot.getChildren()) {
                     final DishOrdered dishOrdered = new DishOrdered();
                     try {
-                        if (!(Integer.parseInt(dishid.child("quantity").getValue(String.class)) == 0)) {
+                        if (!(dishid.child("quantity").getValue(Integer.class) == 0)) {
                             dishOrdered.setDishID(dishid.getKey());
                             dishOrdered.setDishName(dishid.child("name").getValue(String.class));
                             dishOrdered.setDishPrice(dishid.child("price").getValue(String.class));
-                            dishOrdered.setDishQuantity(dishid.child("quantity").getValue(String.class));
-                            dishQuantity = Integer.parseInt(dishid.child("quantity").getValue(String.class));
-                            dishAmount = Integer.parseInt(dishid.child("quantity").getValue(String.class)) * Integer.parseInt(dishid.child("price").getValue(String.class));
+                            dishOrdered.setDishQuantity(dishid.child("quantity").getValue(Integer.class));
+                            dishQuantity = dishid.child("quantity").getValue(Integer.class);
+                            dishAmount = dishQuantity * Integer.parseInt(dishid.child("price").getValue(String.class));
                             dishOrdered.setDishAmount(dishAmount + "");
                             amount += dishAmount;
                             Log.e("amount : ", "" + amount);
                             dishitems.add(dishOrdered);
-                            totalAmount.setText(getResources().getString(R.string.Rs)+amount);
+                            totalAmount.setText(getResources().getString(R.string.Rs) + amount);
                         }
-                    }
-                    catch (Exception e){
-                        Log.e("ConfirmationActivity",""+e);
+                    } catch (Exception e) {
+                        Log.e("ConfirmationActivity", "" + e);
                     }
                 }
                 cartAdapter.notifyDataSetChanged();
@@ -95,7 +115,34 @@ public class ConfirmationActivity extends AppCompatActivity {
 
             }
         };
-        mTableRef.child("cart").addValueEventListener(mTableRefListener);
+        try {
+            mTableRef.child("bill").addValueEventListener(mTableRefListener);
+        }catch (Exception e){
+
+        }
+
+        try {
+            confirmStatusListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.child("confirmStatus").getValue(String.class).equalsIgnoreCase("true")) {
+                        cartContent.setVisibility(View.VISIBLE);
+                        amountLinear.setVisibility(View.VISIBLE);
+                        yourOrder.setVisibility(View.VISIBLE);
+                        orderStatus.setText("Order Confirmed");
+                        //orderAdd.setClickable(true);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+        }catch (Exception e){
+
+        }
+        mDataRef.addValueEventListener(confirmStatusListener);
 
         callWaiter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,8 +164,27 @@ public class ConfirmationActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        cartContent.setVisibility(View.GONE);
+        amountLinear.setVisibility(View.GONE);
+        yourOrder.setVisibility(View.GONE);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         mTableRef.child("cart").removeEventListener(mTableRefListener);
+        mDataRef.removeEventListener(confirmStatusListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //mTableRef.child("cart").addValueEventListener(mTableRefListener);
+        mDataRef.addValueEventListener(confirmStatusListener);
+        cartContent.setVisibility(View.GONE);
+        amountLinear.setVisibility(View.GONE);
+        yourOrder.setVisibility(View.GONE);
     }
 }

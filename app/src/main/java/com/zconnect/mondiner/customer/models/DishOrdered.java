@@ -8,7 +8,7 @@ public class DishOrdered {
     private String dishName;
     private String dishID;
     private String dishPrice;
-    private String dishQuantity;
+    private Integer dishQuantity;
     private String dishAmount;
 
     public String getDishAmount() {
@@ -51,20 +51,20 @@ public class DishOrdered {
         this.dishPrice = dishPrice;
     }
 
-    public String getDishQuantity() {
+    public int getDishQuantity() {
         if(dishQuantity!=null) {
             return dishQuantity;
         }
         else {
-            return "0";
+            return 0;
         }
     }
 
-    public void setDishQuantity(String dishQuantity) {
+    public void setDishQuantity(int dishQuantity) {
         this.dishQuantity = dishQuantity;
     }
 
-    public DishOrdered(String dishName, String dishID, String dishPrice, String dishQuantity) {
+    public DishOrdered(String dishName, String dishID, String dishPrice, int dishQuantity) {
         this.dishName = dishName;
         this.dishID = dishID;
         this.dishPrice = dishPrice;
