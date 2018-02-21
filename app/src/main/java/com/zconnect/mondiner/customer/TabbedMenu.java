@@ -432,6 +432,10 @@ public class TabbedMenu extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
+                .child(Details.TABLE_ID).child("currentOrder").child("activeUsers").child(Details.USER_ID);
+        mTableRef.child("name").setValue(Details.USERNAME);
+        mTableRef.child("confirmStatus").setValue("no");
         mMenuRef.addValueEventListener(mMenuRefListener);
         mRestRef.addValueEventListener(mRestRefListener);
     }
