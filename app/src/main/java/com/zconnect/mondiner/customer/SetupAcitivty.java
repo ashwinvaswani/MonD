@@ -1,5 +1,7 @@
 package com.zconnect.mondiner.customer;
 
+import android.*;
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -58,6 +60,7 @@ public class SetupAcitivty extends AppCompatActivity {
     private String contact;
     private String userID;
     private final int RC_PERM_REQ_EXT_STORAGE = 7;
+    private final int MY_GALLERY_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +92,17 @@ public class SetupAcitivty extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //if (checkPermissionREAD_EXTERNAL_STORAGE(SetupAcitivty.this)) {
+                if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            MY_GALLERY_REQUEST_CODE);
+                }
+
+                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            MY_GALLERY_REQUEST_CODE);
+                }
                     Intent galleryIntent = new Intent();
                     galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
                     galleryIntent.setType("image/*");
@@ -221,7 +235,7 @@ public class SetupAcitivty extends AppCompatActivity {
     }*/
 
 
-    public boolean checkPermissionREAD_EXTERNAL_STORAGE(
+/*    public boolean checkPermissionREAD_EXTERNAL_STORAGE(
             final Context context) {
         int currentAPIVersion = Build.VERSION.SDK_INT;
         if (currentAPIVersion >= android.os.Build.VERSION_CODES.M) {
@@ -249,7 +263,7 @@ public class SetupAcitivty extends AppCompatActivity {
         } else {
             return true;
         }
-    }
+    }*/
 
     public void showDialog(final String msg, final Context context,
                            final String permission) {
@@ -269,7 +283,7 @@ public class SetupAcitivty extends AppCompatActivity {
         alert.show();
     }
 
-    @Override
+    /*@Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
         switch (requestCode) {
@@ -285,11 +299,12 @@ public class SetupAcitivty extends AppCompatActivity {
                 super.onRequestPermissionsResult(requestCode, permissions,
                         grantResults);
         }
-    }
+    }*/
 
     @Override
     protected void onStart() {
         super.onStart();
+
         //Log.e("SetupActivity", "User Id : " + mAuth.getCurrentUser().getUid().toString());
         /*Intent setupIntent = new Intent(SetupAcitivty.this, QR_Offers_prevOrders.class);
         setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

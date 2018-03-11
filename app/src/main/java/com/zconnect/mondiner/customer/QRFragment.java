@@ -2,8 +2,10 @@ package com.zconnect.mondiner.customer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -12,6 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -19,116 +28,74 @@ import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.CaptureManager;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
+import com.journeyapps.barcodescanner.DefaultDecoderFactory;
+import com.zconnect.mondiner.customer.utils.Details;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link QRFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link QRFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class QRFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import static android.hardware.camera2.CaptureResult.FLASH_STATE;
+import static com.google.zxing.client.android.Intents.Scan.CAMERA_ID;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
+public class QRFragment extends Fragment implements ZXingScannerView.ResultHandler{
 
     private String contents;
-
+    private ZXingScannerView mScannerView;
     DecoratedBarcodeView decoratedBarcodeView;
     private CaptureManager capture;
 
+    private static final String FLASH_STATE = "FLASH_STATE";
+    private static final String AUTO_FOCUS_STATE = "AUTO_FOCUS_STATE";
+    private static final String SELECTED_FORMATS = "SELECTED_FORMATS";
+    private static final String CAMERA_ID = "CAMERA_ID";
+    private boolean mFlash;
+    private boolean mAutoFocus;
+    private int mCameraId = -1;
+    private ArrayList<Integer> mSelectedIndices;
+
+    private ValueEventListener restListener;
+
     private OnFragmentInteractionListener mListener;
 
-    private BarcodeCallback callback = new BarcodeCallback() {
-        @Override
-        public void barcodeResult(BarcodeResult result) {
-            if(result.getText()==null){
-                return;
-            }
-            contents = result.getText();
-            Log.e("QRFragment","The result from the QR is : " + result.getText());
-            decoratedBarcodeView.setStatusText(contents);
-
-        }
-
-        @Override
-        public void possibleResultPoints(List<ResultPoint> resultPoints) {
-
-        }
-    };
+    private DatabaseReference mRefRestID;
+    private SharedPreferences preferences;
 
     public QRFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment QRFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static QRFragment newInstance(String param1, String param2) {
-        QRFragment fragment = new QRFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle state) {
         // Inflate the layout for this fragment
+        Log.e("QRFragment","in onCreateView");
+        mRefRestID = FirebaseDatabase.getInstance().getReference().child("restaurants");
+        preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-        View rootView = inflater.inflate(R.layout.fragment_qr, container,false);
-
-        decoratedBarcodeView=rootView.findViewById(R.id.decid);
-        decoratedBarcodeView.decodeContinuous(callback);
-        //decoratedBarcodeView.setStatusText("dsdfsdfsfsdfg");
-
-        capture = new CaptureManager(getActivity(), decoratedBarcodeView);
-        //capture.initializeFromIntent(rootView, savedInstanceState);
-        capture.decode();
-
-        IntentIntegrator intentIntegrator=IntentIntegrator.forSupportFragment(this);
-        //intentIntegrator.set
-        //decoratedBarcodeView.resume();
-        intentIntegrator.setPrompt("Scan a barcode");
-        intentIntegrator.setOrientationLocked(true);
-        //intentIntegrator.initiateScan(); // `this` is the current Fragment
-
-        return rootView;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        mScannerView = new ZXingScannerView(getActivity());
+        if(state != null) {
+            mFlash = state.getBoolean(FLASH_STATE, false);
+            mAutoFocus = state.getBoolean(AUTO_FOCUS_STATE, true);
+            mSelectedIndices = state.getIntegerArrayList(SELECTED_FORMATS);
+            mCameraId = state.getInt(CAMERA_ID, -1);
+        } else {
+            mFlash = false;
+            mAutoFocus = true;
+            mSelectedIndices = null;
+            mCameraId = -1;
+        }
+        setupFormats();
+        Log.e("QRFragment","after setupFormats");
 
 
+        return mScannerView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -139,16 +106,121 @@ public class QRFragment extends Fragment {
     }
 
 
+
+    public void setupFormats() {
+        List<BarcodeFormat> formats = new ArrayList<BarcodeFormat>();
+        if (mSelectedIndices == null || mSelectedIndices.isEmpty()) {
+            mSelectedIndices = new ArrayList<Integer>();
+            for (int i = 0; i < ZXingScannerView.ALL_FORMATS.size(); i++) {
+                mSelectedIndices.add(i);
+            }
+        }
+
+        for (int index : mSelectedIndices) {
+            formats.add(ZXingScannerView.ALL_FORMATS.get(index));
+        }
+        if (mScannerView != null) {
+            mScannerView.setFormats(formats);
+        }
+    }
+    public void onCameraSelected(int cameraId) {
+        mCameraId = cameraId;
+        mScannerView.startCamera(mCameraId);
+        mScannerView.setFlash(mFlash);
+        mScannerView.setAutoFocus(mAutoFocus);
+    }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(FLASH_STATE, mFlash);
+        outState.putBoolean(AUTO_FOCUS_STATE, mAutoFocus);
+        outState.putIntegerArrayList(SELECTED_FORMATS, mSelectedIndices);
+        outState.putInt(CAMERA_ID, mCameraId);
+    }
+
+    @Override
+    public void handleResult(Result result) {
+        Toast.makeText(getContext(), "" + result.getText(), Toast.LENGTH_SHORT).show();
+        if (result.getText().toString() == null) {
+            Toast.makeText(getContext(), "QR not scanned", Toast.LENGTH_LONG).show();
+        } else {
+            try {//Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                Log.e("QrActivity", "QR Scanned = " + result.getText());
+                String information[] = result.getText().toString().split(";");
+                String RestID = information[0].trim();
+                String TableID = information[1].trim();
+                preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("restaurantId", RestID);
+                editor.putString("currentTableId", TableID);
+                editor.apply();
+                Log.e("QrActivity", "Table : " + information[1].trim());
+                checkRestId(RestID, TableID);
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Data cannot be processed", Toast.LENGTH_SHORT).show();
+            }
+            //info 0 RestID and info 1 has TableID
+        }
+    }
+
+    private void checkRestId(final String restID, final String tableID) {
+        restListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot childSnapShot : dataSnapshot.getChildren()) {
+                    if (childSnapShot.getKey().equals(restID)) {
+                        Log.e("QrActivity", "Rest ID found" + restID);
+                        //      Toast.makeText(QR_Offers_prevOrders.this, "The RestID was equal!", Toast.LENGTH_SHORT).show();
+                        checkTableID(childSnapShot, tableID, restID);
+                    } else {
+                        continue;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mRefRestID.addValueEventListener(restListener);
+    }
+
+    private void checkTableID(DataSnapshot childSnapShot, String tableID, String restID) {
+        Toast.makeText(getContext(), "Clear TOp", Toast.LENGTH_SHORT).show();
+        for (DataSnapshot grandChildSnapShot : childSnapShot.child("table").getChildren()) {
+            if (grandChildSnapShot.getKey().equals(tableID)) {
+                preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                String restaurantId = preferences.getString("restaurantId", "");
+                String currentTableId = preferences.getString("currentTableId","");
+                Details.REST_ID = restaurantId;
+                Details.TABLE_ID = currentTableId;
+                Log.e("QRActivity","Checking shared preferences : " + Details.REST_ID + "--" + Details.TABLE_ID);
+                mRefRestID.child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("availability").setValue("false");
+                Intent tomain = new Intent(getActivity(), TabbedMenu.class);
+                tomain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                Toast.makeText(getContext(), "Please select your dishes...", Toast.LENGTH_SHORT).show();
+                mRefRestID.removeEventListener(restListener);
+                startActivity(tomain);
+            } else {
+                continue;
+            }
+        }
+    }
+
     @Override
     public void onPause() {
         super.onPause();
-        decoratedBarcodeView.pauseAndWait();
+//        decoratedBarcodeView.pauseAndWait();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        decoratedBarcodeView.resume();
+        mScannerView.setResultHandler(this);
+        mScannerView.startCamera(mCameraId);
+        mScannerView.setFlash(mFlash);
+        mScannerView.setAutoFocus(mAutoFocus);
     }
 
     @Override

@@ -181,48 +181,8 @@ public class TabbedMenu extends AppCompatActivity {
         });
     }
 
-
-
-/*
-    private void setupDishesID() {
-
-        mMenuDishesRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                int j = 0;
-                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-
-                    cIdArray[j] = childSnapshot.getKey();
-                    Log.e("TabbedMenu", cIdArray[j]);
-
-                    if (cIdArray[j] != null) {
-                        Details.CUISINE_ID_ARRAY.add(cIdArray[j]);
-                        j++;
-                    }
-                }
-                setupViewPager();
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("TabbedMenu", "DatabaseError onCancelled" + databaseError.toString());
-            }
-        });
-    }
-*/
-
     private void setupViewPager() {
         final ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-//        Details.CUISINE_INDEX = 0;
-//        for(int i=0; i<tabsInfo.size(); i++){
-//            for(int j=i+1; j<tabsInfo.size(); j++){
-//                if(Integer.parseInt(tabsInfo.get(i).getCatPriority())>Integer.parseInt(tabsInfo.get(j).getCatPriority())){
-//                    Tabs temp = new Tabs();
-//                    temp = tabsInfo.get(i);
-//                    tabsInfo.re.get(i) = tabsInfo.get(j);
-//
-//                }
-//            }
-//        }
         TabFragment tabs[] = new TabFragment[tabsInfo.size()];
         for (int i = 0; i < tabsInfo.size(); i++) {
 //            Log.e("TabbedMenu -- ", "cArray[i] : " + cArray[i] + "cIdArray : " + cIdArray[i] + " Current Cuisines : " + Details.CUISINE_ID_ARRAY.toString());
@@ -292,43 +252,6 @@ public class TabbedMenu extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-//    public static class PlaceholderFragment extends Fragment {
-//        /**
-//         * The fragment argument representing the section number for this
-//         * fragmen  t.
-//         */
-//        private static final String ARG_SECTION_NUMBER = "section_number";
-//
-//        public PlaceholderFragment() {
-//        }
-//
-//        /**
-//         * Returns a new instance of this fragment for the given section
-//         * number.
-//         */
-//        public static PlaceholderFragment newInstance(int sectionNumber) {
-//            PlaceholderFragment fragment = new PlaceholderFragment();
-//            Bundle args = new Bundle();
-//            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-//            fragment.setArguments(args);
-//            return fragment;
-//        }
-//
-//        @Override
-//        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-//                                 Bundle savedInstanceState) {
-//            View rootView = inflater.inflate(R.layout.tab_fragment, container, false);
-//            /*TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-//            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));*/
-//            return rootView;
-//        }
-//    }
-
-
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
@@ -427,6 +350,12 @@ public class TabbedMenu extends AppCompatActivity {
         mMenuRef.removeEventListener(mMenuRefListener);
         mDatabaseUsers.removeEventListener(mDatabaseUsersListener);
         mRestRef.removeEventListener(mRestRefListener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
     }
 
     @Override

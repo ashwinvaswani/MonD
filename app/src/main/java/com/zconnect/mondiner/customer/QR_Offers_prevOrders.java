@@ -2,11 +2,13 @@ package com.zconnect.mondiner.customer;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -32,6 +34,7 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
     //private SharedPreferences preferences;
     private SharedPreferences preferences;
     private ValueEventListener restListener;
+    private static final int MY_CAMERA_REQUEST_CODE = 100;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -44,9 +47,7 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
                     fragmentTransaction.replace(R.id.fragmentContainer, new OffersFragment()).commit();
                     return true;
                 case R.id.navigation_scanQR: {
-                    //fragmentTransaction.replace(R.id.fragmentContainer, new QRFragment()).commit();
-                    //qrScan.forSupportFragment( new QRFragment()).initiateScan();
-                    qrScan.initiateScan();
+                    fragmentTransaction.replace(R.id.fragmentContainer, new QRFragment()).commit();
                     return true;
                 }
                 case R.id.navigation_previousOrders:
@@ -61,13 +62,18 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.qr_offers_prevorders);
-        qrScan = new IntentIntegrator(this);
+       // qrScan = new IntentIntegrator(this);
         mRefRestID = FirebaseDatabase.getInstance().getReference().child("restaurants");
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String userID = preferences.getString("userID", "");
         String username = preferences.getString("username","");
         Details.USER_ID = userID;
         Details.USERNAME = username;
+        if (checkSelfPermission(android.Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.CAMERA},
+                    MY_CAMERA_REQUEST_CODE);
+        }
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentContainer, new QRFragment()).commit();
@@ -109,8 +115,9 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             if (result.getContents() == null) {
@@ -138,74 +145,7 @@ public class QR_Offers_prevOrders extends AppCompatActivity {
             super.onActivityResult(requestCode, resultCode, data);
         }
 
-    }
-
-    private void checkRestId(final String restID, final String tableID) {
-        restListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot childSnapShot : dataSnapshot.getChildren()) {
-                    if (childSnapShot.getKey().equals(restID)) {
-                        Log.e("QrActivity", "Rest ID found" + restID);
-                  //      Toast.makeText(QR_Offers_prevOrders.this, "The RestID was equal!", Toast.LENGTH_SHORT).show();
-                        checkTableID(childSnapShot, tableID, restID);
-                    } else {
-                        continue;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        mRefRestID.addValueEventListener(restListener);
-        /*mRefRestID.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot childSnapShot : dataSnapshot.getChildren()) {
-                    if (childSnapShot.getKey().equals(restID)) {
-                        Log.e("QrActivity", "Rest ID found" + restID);
-                        Toast.makeText(QR_Offers_prevOrders.this, "The RestID was equal!", Toast.LENGTH_SHORT).show();
-                        checkTableID(childSnapShot, tableID, restID);
-                    } else {
-                        continue;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("QrActivity", "checkRestID : Database connection failed" + databaseError.toString());
-            }
-        });*/
-    }
-
-    private void checkTableID(DataSnapshot childSnapShot, String tableID, String restID) {
-        for (DataSnapshot grandChildSnapShot : childSnapShot.child("table").getChildren()) {
-            if (grandChildSnapShot.getKey().equals(tableID)) {
-        /*        if(grandChildSnapShot.child("availability").getValue(String.class)!=null){
-                        if(grandChildSnapShot.child("availability").getValue(String.class).equals("true") ||
-                                grandChildSnapShot.child("availability").getValue(String.class).equals("1") ) {
-                            Log.e("QrActivity","Table available. NEW INTENT OPEN! COngo");*/
-                preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                String restaurantId = preferences.getString("restaurantId", "");
-                String currentTableId = preferences.getString("currentTableId","");
-                Details.REST_ID = restaurantId;
-                Details.TABLE_ID = currentTableId;
-                Log.e("QRActivity","Checking shared preferences : " + Details.REST_ID + "--" + Details.TABLE_ID);
-                mRefRestID.child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("availability").setValue("false");
-                Intent tomain = new Intent(QR_Offers_prevOrders.this, TabbedMenu.class);
-                Toast.makeText(this, "Please select your dishes...", Toast.LENGTH_SHORT).show();
-                mRefRestID.removeEventListener(restListener);
-                startActivity(tomain);
-            } else {
-                continue;
-            }
-        }
-    }
-
+    }*/
 
     @Override
     protected void onStart() {
