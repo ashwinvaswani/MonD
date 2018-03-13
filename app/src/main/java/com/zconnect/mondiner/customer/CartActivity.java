@@ -197,6 +197,7 @@ public class CartActivity extends AppCompatActivity {
                     Toast.makeText(CartActivity.this, "Order confirmed by all users.", Toast.LENGTH_SHORT).show();
                     Intent setupIntent = new Intent(CartActivity.this, ConfirmationActivity .class);
                     setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    finish();
                     startActivity(setupIntent);
                 }
             }
@@ -212,27 +213,20 @@ public class CartActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        /*Intent setupIntent = new Intent(CartActivity.this, ConfirmationActivity .class);
-        setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(setupIntent);*/
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         mCurrentOrderRef.child("currentOrder").child("cart").removeEventListener(mCurrentOrderCartListener);
         mCurrentOrderRef.child("currentOrder").child("activeUsers").removeEventListener(mCurrentOrderUsersListener);
         mCurrentOrderRef.child("currentOrder").child("activeUsers").removeEventListener(mAllUsersListener);
+
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();/*
+    protected void onRestart() {
+        super.onRestart();
         mCurrentOrderRef.child("currentOrder").child("cart").addValueEventListener(mCurrentOrderCartListener);
         mCurrentOrderRef.child("currentOrder").child("activeUsers").addValueEventListener(mCurrentOrderUsersListener);
-        mCurrentOrderRef.child("currentOrder").child("activeUsers").addValueEventListener(mAllUsersListener);*/
+        mCurrentOrderRef.child("currentOrder").child("activeUsers").addValueEventListener(mAllUsersListener);
     }
 }
 

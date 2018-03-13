@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -26,6 +27,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.zconnect.mondiner.customer.models.Tabs;
 import com.zconnect.mondiner.customer.utils.Details;
@@ -66,7 +68,10 @@ public class TabbedMenu extends AppCompatActivity {
     private ProgressDialog mProgress;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseUsers;
+    private Query mDatabase;
     private ValueEventListener mDatabaseUsersListener;
+    private static final int TIME_DELAY = 2000;
+    private static long back_pressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +108,6 @@ public class TabbedMenu extends AppCompatActivity {
         mProgress.show();
         mProgress.setCancelable(false);
         mRestRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("info").child("name");
-        mRestRef.addValueEventListener(mRestRefListener);
         //incDec = findViewById(R.id.inc_dec);
         //Details.REST_ID = rest_id;
         //Details.TABLE_ID = table_id;
@@ -126,9 +130,10 @@ public class TabbedMenu extends AppCompatActivity {
 
         mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
                 .child(Details.TABLE_ID).child("currentOrder").child("activeUsers").child(Details.USER_ID);
-        mTableRef.child("name").setValue(Details.USERNAME);
-        mTableRef.child("confirmStatus").setValue("no");
-
+        if (Details.USER_ID!=null) {
+            mTableRef.child("name").setValue(Details.USERNAME);
+            mTableRef.child("confirmStatus").setValue("no");
+        }
        /* findViewById(R.id.action_prev_orders).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -163,8 +168,6 @@ public class TabbedMenu extends AppCompatActivity {
             }
         };
 
-        mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("categories");
-        mMenuRef.addValueEventListener(mMenuRefListener);
 
 
         //fab
@@ -301,12 +304,16 @@ public class TabbedMenu extends AppCompatActivity {
         String username = preferences.getString("username","");
         /*Intent tomain = new Intent(TabbedMenu.this, QR_Offers_prevOrders.class);
         startActivity(tomain);*/
-        if(userID==null || userID.isEmpty() || mAuth.getCurrentUser().getUid()==null){
+
+
+        if(mAuth.getCurrentUser().getUid()==null){
             Intent tomain = new Intent(TabbedMenu.this, LoginActivity.class);
             tomain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(tomain);
-        }
-        try {
+        }else {
+
+
+            try {
                 mDatabaseUsersListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -318,15 +325,14 @@ public class TabbedMenu extends AppCompatActivity {
                                     break;
                                 }
                             }
-                            if (restaurantId.equals(null) || restaurantId.isEmpty() || currentTableId.equals(null) || currentTableId.isEmpty()) {
+                            if (flag == 0) {
+                                Log.e("TabbedMenu", "In flag==0. Intent should open");
+                                Intent toSetup = new Intent(TabbedMenu.this, SetupAcitivty.class);
+                                startActivity(toSetup);
+                            }else if(restaurantId.equals(null) || restaurantId.isEmpty() || currentTableId.equals(null) || currentTableId.isEmpty()) {
                                 Intent tomain = new Intent(TabbedMenu.this, QR_Offers_prevOrders.class);
                                 startActivity(tomain);
                             }
-                         /*if (flag == 0) {
-                             Log.e("TabbedMenu", "In flag==0. Intent should open");
-                             Intent toSetup = new Intent(TabbedMenu.this, SetupAcitivty.class);
-                             startActivity(toSetup);
-                         }*/
                         }
                     }
 
@@ -336,26 +342,33 @@ public class TabbedMenu extends AppCompatActivity {
                     }
                 };
                 mDatabaseUsers.addValueEventListener(mDatabaseUsersListener);
+            }
+            catch (Exception e){
+                Log.e("TabbedMenu","Error : " + e);
+            }
         }
-        catch (Exception e){
-            Log.e("TabbedMenu","Error : " + e);
-        }
+        //TODO : Change this to query
+
         Log.e("TabbedMenu","The details are : "+ restaurantId +" "+ currentTableId+ " " + userID+" " + username);
 
+
+        mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("categories");
+        mMenuRef.addValueEventListener(mMenuRefListener);
+        mRestRef.addValueEventListener(mRestRefListener);
     }
+
 
     @Override
     protected void onPause() {
         super.onPause();
-        mMenuRef.removeEventListener(mMenuRefListener);
-        mDatabaseUsers.removeEventListener(mDatabaseUsersListener);
-        mRestRef.removeEventListener(mRestRefListener);
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
+    protected void onStop() {
+        super.onStop();
+        mMenuRef.removeEventListener(mMenuRefListener);
+        mDatabaseUsers.removeEventListener(mDatabaseUsersListener);
+        mRestRef.removeEventListener(mRestRefListener);
     }
 
     @Override
@@ -369,45 +382,15 @@ public class TabbedMenu extends AppCompatActivity {
         mRestRef.addValueEventListener(mRestRefListener);
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    /*public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
+    @Override
+    public void onBackPressed() {
+        if (back_pressed + TIME_DELAY > System.currentTimeMillis()) {
+            super.onBackPressed();
+        } else {
+            Toast.makeText(getBaseContext(), "Press once again to exit!",
+                    Toast.LENGTH_SHORT).show();
         }
+        back_pressed = System.currentTimeMillis();
+    }
 
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-
-                default:
-                    return null;
-
-            }
-        }
-
-           @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 4;
-        }
-
-        @Override
-        public CharSequence getPageTitle (int position){
-            switch (position){
-                case 0:
-                    return "Indian";
-                case 1:
-                    return "Chinese";
-                case 2:
-                    return "Beverages";
-                case 3:
-                    return "Continental";
-            }
-                return null;
-        }
-    }*/
 }

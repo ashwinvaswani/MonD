@@ -172,19 +172,24 @@ public class ConfirmationActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         mTableRef.child("cart").removeEventListener(mTableRefListener);
         mDataRef.removeEventListener(confirmStatusListener);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        //mTableRef.child("cart").addValueEventListener(mTableRefListener);
+    protected void onRestart() {
+        super.onRestart();
+        mTableRef.child("cart").addValueEventListener(mTableRefListener);
         mDataRef.addValueEventListener(confirmStatusListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();/*
         cartContent.setVisibility(View.GONE);
         amountLinear.setVisibility(View.GONE);
-        yourOrder.setVisibility(View.GONE);
+        yourOrder.setVisibility(View.GONE);*/
     }
 }

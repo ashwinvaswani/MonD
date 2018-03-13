@@ -92,16 +92,15 @@ public class SetupAcitivty extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //if (checkPermissionREAD_EXTERNAL_STORAGE(SetupAcitivty.this)) {
-                if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            MY_GALLERY_REQUEST_CODE);
-                }
-
-                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            MY_GALLERY_REQUEST_CODE);
+                if (ContextCompat.checkSelfPermission(
+                        SetupAcitivty.this,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                        PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(
+                            SetupAcitivty.this,
+                            new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            12345
+                    );
                 }
                     Intent galleryIntent = new Intent();
                     galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
@@ -137,7 +136,6 @@ public class SetupAcitivty extends AppCompatActivity {
                     mDatabaseUsers.child(userID).child("image").setValue(downloadUri);
                     mDatabaseUsers.child(userID).child("contact").setValue(contact);
                     mProgress.dismiss();
-
                     Intent tomain = new Intent(SetupAcitivty.this, TabbedMenu.class);
                     tomain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(tomain);
@@ -197,74 +195,6 @@ public class SetupAcitivty extends AppCompatActivity {
         }
     }
 
-    /*public boolean checkPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
-                || ContextCompat.checkSelfPermission(SetupAcitivty.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        if (ActivityCompat.shouldShowRequestPermissionRationale(SetupAcitivty.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(SetupAcitivty.this);
-            alertBuilder.setCancelable(true);
-            alertBuilder.setTitle("Permission necessary");
-            alertBuilder.setMessage("Permission to read storage is required .");
-            alertBuilder.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
-                @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions(SetupAcitivty.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 7);
-                }
-            });
-            AlertDialog alert = alertBuilder.create();
-            alert.show();
-        } else {
-            ActivityCompat.requestPermissions(SetupAcitivty.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, RC_PERM_REQ_EXT_STORAGE);
-        }
-        return false;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == RC_PERM_REQ_EXT_STORAGE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startActivity(new Intent(SetupAcitivty.this, QR_Offers_prevOrders.class));
-                finish();
-            } else {
-                Toast.makeText(this, "Permission Denied !, Retrying.", Toast.LENGTH_SHORT).show();
-                checkPermission();
-            }
-        }
-    }*/
-
-
-/*    public boolean checkPermissionREAD_EXTERNAL_STORAGE(
-            final Context context) {
-        int currentAPIVersion = Build.VERSION.SDK_INT;
-        if (currentAPIVersion >= android.os.Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(context,
-                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(
-                        (Activity) context,
-                            Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                            showDialog("External storage", context,
-                            Manifest.permission.READ_EXTERNAL_STORAGE);
-
-                } else {
-                    Log.e("SetupActivity","in else of should show request permission");
-                    ActivityCompat
-                            .requestPermissions(
-                                    (Activity) context,
-                                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                }
-                return false;
-            } else {
-                return true;
-            }
-
-        } else {
-            return true;
-        }
-    }*/
-
     public void showDialog(final String msg, final Context context,
                            final String permission) {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
@@ -283,32 +213,10 @@ public class SetupAcitivty extends AppCompatActivity {
         alert.show();
     }
 
-    /*@Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // do your stuff
-                } else {
-                    Toast.makeText(SetupAcitivty.this, "GET_ACCOUNTS Denied",
-                            Toast.LENGTH_SHORT).show();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions,
-                        grantResults);
-        }
-    }*/
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        //Log.e("SetupActivity", "User Id : " + mAuth.getCurrentUser().getUid().toString());
-        /*Intent setupIntent = new Intent(SetupAcitivty.this, QR_Offers_prevOrders.class);
-        setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(setupIntent);*/
     }
 }
 

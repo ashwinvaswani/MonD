@@ -280,6 +280,9 @@ public class LoginActivity extends AppCompatActivity {
                             editor.putString("userID",""+ mAuth.getCurrentUser().getUid());
                             editor.putString("username",""+account.getDisplayName());
                             editor.apply();
+
+
+
                             Intent setupIntent = new Intent(LoginActivity.this, TabbedMenu.class);
                             startActivity(setupIntent);
                             /*googleName = account.getDisplayName();
