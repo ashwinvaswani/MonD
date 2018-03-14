@@ -70,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
             if(counter ==0){
                 mDatabaseUsers.child(mAuth.getCurrentUser().getUid().toString()).child("name").setValue(googleName);
                 mDatabaseUsers.child(mAuth.getCurrentUser().getUid().toString()).child("email").setValue(googleMail);
-                Intent setupIntent = new Intent(LoginActivity.this, SetupAcitivty.class);
+                Intent setupIntent = new Intent(LoginActivity.this, GoogleSetupAcitivty.class);
                 //setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(setupIntent);
             }
@@ -135,7 +135,7 @@ public class LoginActivity extends AppCompatActivity {
         newAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent setupIntent = new Intent(LoginActivity.this, Register_Activity.class);
+                Intent setupIntent = new Intent(LoginActivity.this, EmailRegisterActivity.class);
                 setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(setupIntent);
             }
@@ -144,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
         /*newAccountbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent registerIntent = new Intent(LoginActivity.this, Register_Activity.class);
+                Intent registerIntent = new Intent(LoginActivity.this, EmailRegisterActivity.class);
                 registerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(registerIntent);
             }
@@ -279,9 +279,9 @@ public class LoginActivity extends AppCompatActivity {
                             SharedPreferences.Editor editor = preferences.edit();
                             editor.putString("userID",""+ mAuth.getCurrentUser().getUid());
                             editor.putString("username",""+account.getDisplayName());
+                            editor.putString("userEmail",""+account.getEmail());
+                            editor.putString("userImage",""+account.getPhotoUrl());
                             editor.apply();
-
-
 
                             Intent setupIntent = new Intent(LoginActivity.this, TabbedMenu.class);
                             startActivity(setupIntent);
@@ -322,7 +322,7 @@ public class LoginActivity extends AppCompatActivity {
                         else {
                             mProgress.dismiss();
                             CheckUserExist();
-                            *//*Intent setupIntent = new Intent(LoginActivity.this, SetupAcitivty.class);
+                            *//*Intent setupIntent = new Intent(LoginActivity.this, GoogleSetupAcitivty.class);
                             setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(setupIntent);*//*
                         }
@@ -367,36 +367,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onStop();
         //mDatabaseUsers.removeEventListener(valueEventListener);
     }
-
-    //TODO : Remove the onStart intent jump
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        Intent tomenu = new Intent(LoginActivity.this, TabbedMenu.class);
-//        tomenu.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(tomenu);
-//    }
-
-    //
-//    private void setupUserDataAndFinish(@NonNull final FirebaseUser user) {
-//        Uri photoUri = user.getPhotoUrl();
-//        String photoUrl;
-//        String defaultPhotoUrl = "https://firebasestorage.googleapis.com/v0/b/zconnect-89fbd.appspot.com/o/PhonebookImage%2FdefaultprofilePhone.png?alt=media&token=5f814762-16dc-4dfb-ba7d-bcff0de7a336";
-//        if (photoUri != null) photoUrl = photoUri.toString();
-//        else photoUrl = defaultPhotoUrl;
-//        DatabaseReference currentUserDbRef = mDatabaseUsers.child(user.getUid());
-//        currentUserDbRef.child("Image").setValue(photoUrl);
-//        currentUserDbRef.child("Username").setValue(user.getDisplayName());
-//        currentUserDbRef.child("Email").setValue(user.getEmail());
-//        finish(); /*Make Sure HomeActivity exists*/
-//    }
-    /*public void sharedPreferences(){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("UserID",Details.USER_ID);
-        editor.apply();
-    }*/
-
 
 
 }

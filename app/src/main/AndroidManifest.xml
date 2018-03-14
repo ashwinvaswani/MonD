@@ -30,8 +30,8 @@
         <activity
             android:name=".LoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Register_Activity"></activity>
-        <activity android:name=".SetupAcitivty">
+        <activity android:name=".EmailRegisterActivity"></activity>
+        <activity android:name=".GoogleSetupAcitivty">
         </activity>
         <activity
             android:name=".QR_Offers_prevOrders"

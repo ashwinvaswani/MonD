@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.zconnect.mondiner.customer.GoogleSetupAcitivty"
+    android:background="@color/background">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/google_setup_image"
+            android:layout_marginTop="20dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            app:roundAsCircle="true"
+            android:scaleType="centerCrop"
+            app:placeholderImage="@mipmap/c245339439045212"
+            tools:layout_editor_absoluteX="126dp"
+            tools:layout_editor_absoluteY="16dp" />
+        <EditText
+            android:id="@+id/google_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:bottomLeftRadius="0dp"
+            android:bottomRightRadius="15dp"
+            android:hint="Name"
+            android:textSize="16dp"
+            android:inputType="textCapSentences"
+            android:drawableLeft="@drawable/ic_person_name"
+            android:drawablePadding="10dp"
+            android:textColorHint="@color/hint"
+            android:textColor="@color/text"
+            android:paddingTop="20dp"/>
+        />
+
+        <EditText
+            android:id="@+id/google_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:bottomLeftRadius="0dp"
+            android:bottomRightRadius="15dp"
+            android:textSize="16dp"
+            android:hint="Email"
+            android:enabled="false"
+            android:drawableLeft="@drawable/ic_mail"
+            android:drawablePadding="10dp"
+            android:textColorHint="@color/hint"
+            android:textColor="@color/hint"
+            />
+        />
+
+        <EditText
+            android:id="@+id/google_contact_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:bottomLeftRadius="0dp"
+            android:bottomRightRadius="15dp"
+            android:textSize="16dp"
+            android:hint="Contact Number"
+            android:drawableLeft="@drawable/ic_contact_number"
+            android:drawablePadding="10dp"
+            android:textColorHint="@color/hint"
+            android:textColor="@color/text"
+            />
+        <EditText
+            android:id="@+id/google_setup_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:bottomLeftRadius="0dp"
+            android:bottomRightRadius="15dp"
+            android:textSize="16dp"
+            android:hint="Nick (optional)"
+            android:drawableLeft="@drawable/ic_nick_person"
+            android:drawablePadding="10dp"
+            android:textColorHint="@color/hint"
+            android:textColor="@color/text"
+            android:layout_marginBottom="10dp"
+            />
+
+        <Button
+            android:id="@+id/google_submit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/primary_button_layout"
+            android:text="SUBMIT"
+            android:textColor="@color/text"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_marginBottom="10dp"
+            />
+
+    </LinearLayout>
+
+
+</android.support.constraint.ConstraintLayout>

@@ -93,7 +93,7 @@ public class UnusedMainActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.hasChild(user_id)) {
-                        Intent tomain = new Intent(UnusedMainActivity.this, Register_Activity.class);
+                        Intent tomain = new Intent(UnusedMainActivity.this, EmailRegisterActivity.class);
                         tomain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(tomain);
                     }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,11 @@ import android.widget.Toast;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -67,6 +73,7 @@ public class TabbedMenu extends AppCompatActivity {
     private SharedPreferences preferences;
     private ProgressDialog mProgress;
     private FirebaseAuth mAuth;
+    private GoogleSignInClient mGoogleSignInClient;
     private DatabaseReference mDatabaseUsers;
     private Query mDatabase;
     private ValueEventListener mDatabaseUsersListener;
@@ -107,6 +114,11 @@ public class TabbedMenu extends AppCompatActivity {
         mProgress.setMessage("Loading");
         mProgress.show();
         mProgress.setCancelable(false);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         mRestRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("info").child("name");
         //incDec = findViewById(R.id.inc_dec);
         //Details.REST_ID = rest_id;
@@ -248,6 +260,16 @@ public class TabbedMenu extends AppCompatActivity {
             Details.USERNAME = "";
             //Log.e("TabbedMenu","mAuth : "+mAuth.getCurrentUser().getUid());
             mAuth.signOut();
+            try {
+                mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                        new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                            }
+                        });
+            }catch (Exception e){
+
+            }
             //onStart();
             startActivity(setupIntent);
             return true;
@@ -304,43 +326,43 @@ public class TabbedMenu extends AppCompatActivity {
         String username = preferences.getString("username","");
         /*Intent tomain = new Intent(TabbedMenu.this, QR_Offers_prevOrders.class);
         startActivity(tomain);*/
+        mDatabaseUsersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!mAuth.getCurrentUser().getUid().equals(null)) {
+                    int flag = 0;
+                    for (DataSnapshot users : dataSnapshot.getChildren()) {
+                        if (users.getKey().equals(mAuth.getCurrentUser().getUid())) {
+                            flag = 1;
+                            break;
+                        }
+                    }
+                    if (flag == 0) {
+                        Log.e("TabbedMenu", "In flag==0. Intent should open");
+                        //IMPORTANT
+                        //Here only GoogleSetup is there because the email and password data is added to the database while registering.
+                        //And the data of google sign-in is added at the time of setup in GoogleSetupActivity
+                        Intent toSetup = new Intent(TabbedMenu.this, GoogleSetupAcitivty.class);
+                        startActivity(toSetup);
+                    }else if(restaurantId.equals(null) || restaurantId.isEmpty() || currentTableId.equals(null) || currentTableId.isEmpty()) {
+                        Intent tomain = new Intent(TabbedMenu.this, QR_Offers_prevOrders.class);
+                        startActivity(tomain);
+                    }
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-        if(mAuth.getCurrentUser().getUid()==null){
+            }
+        };
+
+        if(mAuth.getCurrentUser()==null){
             Intent tomain = new Intent(TabbedMenu.this, LoginActivity.class);
             tomain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(tomain);
         }else {
-
-
             try {
-                mDatabaseUsersListener = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (!mAuth.getCurrentUser().getUid().equals(null)) {
-                            int flag = 0;
-                            for (DataSnapshot users : dataSnapshot.getChildren()) {
-                                if (users.getKey().equals(mAuth.getCurrentUser().getUid())) {
-                                    flag = 1;
-                                    break;
-                                }
-                            }
-                            if (flag == 0) {
-                                Log.e("TabbedMenu", "In flag==0. Intent should open");
-                                Intent toSetup = new Intent(TabbedMenu.this, SetupAcitivty.class);
-                                startActivity(toSetup);
-                            }else if(restaurantId.equals(null) || restaurantId.isEmpty() || currentTableId.equals(null) || currentTableId.isEmpty()) {
-                                Intent tomain = new Intent(TabbedMenu.this, QR_Offers_prevOrders.class);
-                                startActivity(tomain);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                };
                 mDatabaseUsers.addValueEventListener(mDatabaseUsersListener);
             }
             catch (Exception e){
