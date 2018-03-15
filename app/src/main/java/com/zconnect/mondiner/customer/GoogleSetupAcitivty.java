@@ -84,13 +84,15 @@ public class GoogleSetupAcitivty extends AppCompatActivity {
         mEmailField = findViewById(R.id.google_email);
         mContact = findViewById(R.id.google_contact_number);
         mNick = findViewById(R.id.google_setup_name);
-        Log.e("GoogleSetup","in onCreate of Activity");
+        Log.e("GoogleSetup", "in onCreate of Activity");
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         final String googleName = preferences.getString("username", "");
         final String googleEmail = preferences.getString("userEmail", "");
         final String googleImage = preferences.getString("userImage", "");
         mNameField.setText(googleName);
         mEmailField.setText(googleEmail);
+        mGoogleSetupImage.setImageURI(googleImage);
+        resultUri = Uri.parse(googleImage);
 
         if (ContextCompat.checkSelfPermission(
                 GoogleSetupAcitivty.this,
@@ -101,24 +103,6 @@ public class GoogleSetupAcitivty extends AppCompatActivity {
                     new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     12345
             );
-        }
-
-        try {
-            resultUri = Uri.parse(googleImage);
-            mGoogleSetupImage.setImageURI(resultUri);
-            Log.e("GoogleSetup","in onCreate try of Bitmap"+resultUri);
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), resultUri);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 10, out);
-            Bitmap bitmap2 = Bitmap.createScaledBitmap(bitmap, 200, 200, true);
-            String path = MediaStore.Images.Media.insertImage(GoogleSetupAcitivty.this.getContentResolver(), bitmap2, resultUri.getLastPathSegment(), null);
-            resultUri = Uri.parse(path);
-            mGoogleSetupImage.setImageURI(resultUri);
-            Log.e("GoogleSetup","path of Bitmap : "+path);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("GoogleSetup", ""+e);
         }
 
         mSubmitBtn = findViewById(R.id.google_submit);
@@ -172,39 +156,47 @@ public class GoogleSetupAcitivty extends AppCompatActivity {
 
             mProgress.setMessage("Finishing Setup...");
             mProgress.show();
+            if (!resultUri.toString().equals(preferences.getString("userImage", ""))) {
+                StorageReference filepath = mStorageImage.child(resultUri.getLastPathSegment());
+                filepath.putFile(resultUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.w("onSuccess", "Entered");
+                        Log.v("TAg", "In On complete success");
+                        final String userId = mAuth.getCurrentUser().getUid();
+                        DatabaseReference currentUserDatabase = mDatabaseUsers.child(userId);
+                        final Map<String, Object> taskMap = new HashMap<String, Object>();
+                        taskMap.put("Username", name);
+                        taskMap.put("Email", email);
+                        String downloadUri = taskSnapshot.getDownloadUrl().toString();
+                        taskMap.put("image", downloadUri);
+                        taskMap.put("nick", nick);
+                        taskMap.put("contact", contact);
+                        currentUserDatabase.updateChildren(taskMap);
+                        mProgress.dismiss();
+                        Intent tomain = new Intent(GoogleSetupAcitivty.this, TabbedMenu.class);
+                        startActivity(tomain);
 
-            StorageReference filepath = mStorageImage.child(resultUri.getLastPathSegment());
-            filepath.putFile(resultUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Log.w("onSuccess", "Entered");
-                    Log.v("TAg", "In On complete success");
-                    final String userId = mAuth.getCurrentUser().getUid();
-                    DatabaseReference currentUserDatabase = mDatabaseUsers.child(userId);
-                    final Map<String, Object> taskMap = new HashMap<String, Object>();
-                    taskMap.put("Username", name);
-                    taskMap.put("Email", email);
-                    StorageReference filepath = mStorageImage.child(resultUri.getLastPathSegment());
-                    filepath.putFile(resultUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Log.w("onSuccess", "Entered");
-                            String downloadUri = taskSnapshot.getDownloadUrl().toString();
-                            taskMap.put("image", downloadUri);
-                            mProgress.dismiss();
-                        }
-                    });
-
-                    taskMap.put("nick", nick);
-                    taskMap.put("contact", contact);
+                    }
+                });
+            }else{
+                final String userId = mAuth.getCurrentUser().getUid();
+                DatabaseReference currentUserDatabase = mDatabaseUsers.child(userId);
+                final Map<String, Object> taskMap = new HashMap<String, Object>();
+                taskMap.put("Username", name);
+                taskMap.put("Email", email);
+                taskMap.put("image", resultUri.toString());
+                taskMap.put("nick", nick);
+                taskMap.put("contact", contact);
+                try {
                     currentUserDatabase.updateChildren(taskMap);
-                    mProgress.dismiss();
-
-                    Intent tomain = new Intent(GoogleSetupAcitivty.this, TabbedMenu.class);
-                    startActivity(tomain);
-
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
-            });
+                mProgress.dismiss();
+                Intent tomain = new Intent(GoogleSetupAcitivty.this, TabbedMenu.class);
+                startActivity(tomain);
+            }
 
         } else {
             Toast.makeText(this, "Please fill in all details", Toast.LENGTH_SHORT).show();
