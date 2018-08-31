@@ -6,9 +6,14 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/fragment_prev_orders_noItemText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Previous Orders"
+        android:text="No orders to display"
         android:textColor="@color/text"/>
-
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fragment_previous_orders_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </android.support.v7.widget.RecyclerView>
 </FrameLayout>

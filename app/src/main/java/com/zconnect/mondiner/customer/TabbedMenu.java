@@ -1,8 +1,13 @@
 package com.zconnect.mondiner.customer;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -12,6 +17,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -39,8 +46,17 @@ import com.zconnect.mondiner.customer.models.Tabs;
 import com.zconnect.mondiner.customer.utils.Details;
 import com.zconnect.mondiner.customer.utils.FirebasePersistence;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class TabbedMenu extends AppCompatActivity {
 
@@ -77,8 +93,13 @@ public class TabbedMenu extends AppCompatActivity {
     private DatabaseReference mDatabaseUsers;
     private Query mDatabase;
     private ValueEventListener mDatabaseUsersListener;
+    private ValueEventListener mCurrentUsersListener;
     private static final int TIME_DELAY = 2000;
     private static long back_pressed;
+
+
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +108,7 @@ public class TabbedMenu extends AppCompatActivity {
         mRestRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.e("TabbedMenu","Name of Restaurant : "+dataSnapshot.getValue(String.class));
+                Log.e("TabbedMenu", "Name of Restaurant : " + dataSnapshot.getValue(String.class));
                 setTitle(dataSnapshot.getValue(String.class));
             }
 
@@ -97,15 +118,28 @@ public class TabbedMenu extends AppCompatActivity {
             }
         };
 
+        setContentView(R.layout.activity_tabbed__menu);
+       /* mDrawerLayout = findViewById(R.id.main_content);
+        mToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open, R.string.close);
+        mDrawerLayout.addDrawerListener(mToggle);
+        mToggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
+
         mAuth = FirebaseAuth.getInstance();
         Fresco.initialize(this);
-        setContentView(R.layout.activity_tabbed__menu);
+
+        /*if(!isConnected(TabbedMenu.this) || internetConnectionAvailable(1000))
+            buildDialog(TabbedMenu.this).show();
+        else {
+            Toast.makeText(TabbedMenu.this,"Welcome", Toast.LENGTH_SHORT).show();
+
+        }*/
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String restaurantId = preferences.getString("restaurantId", "");
-        String currentTableId = preferences.getString("currentTableId","");
+        String currentTableId = preferences.getString("currentTableId", "");
         String userID = preferences.getString("userID", "");
-        String username = preferences.getString("username","");
+        String username = preferences.getString("username", "");
         Details.REST_ID = restaurantId;
         Details.TABLE_ID = currentTableId;
         Details.USER_ID = userID;
@@ -131,7 +165,7 @@ public class TabbedMenu extends AppCompatActivity {
         tabLayout = findViewById(R.id.tabs);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(" Red Chillies");
+//        getSupportActionBar().setTitle(" Red Chillies");
 
 
         // Set up the ViewPager with the sections adapter.
@@ -141,11 +175,8 @@ public class TabbedMenu extends AppCompatActivity {
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
 
         mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
-                .child(Details.TABLE_ID).child("currentOrder").child("activeUsers").child(Details.USER_ID);
-        if (Details.USER_ID!=null) {
-            mTableRef.child("name").setValue(Details.USERNAME);
-            mTableRef.child("confirmStatus").setValue("no");
-        }
+                .child(Details.TABLE_ID).child("currentOrder").child("activeUsers");
+
        /* findViewById(R.id.action_prev_orders).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -162,7 +193,7 @@ public class TabbedMenu extends AppCompatActivity {
                 //String cuisine = dataSnapshot.child("info").child("servesCuisine").getValue(String.class);
                 tabsInfo.clear();
 
-                for(DataSnapshot childSnapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                     Tabs tab = new Tabs();
                     tab.setCatID(childSnapshot.getKey());
                     tab.setCatName(childSnapshot.child("title").getValue(String.class));
@@ -179,7 +210,6 @@ public class TabbedMenu extends AppCompatActivity {
                 Log.e("TabbedMenu", "DatabaseError onCancelled" + databaseError.toString());
             }
         };
-
 
 
         //fab
@@ -229,21 +259,22 @@ public class TabbedMenu extends AppCompatActivity {
             editor.remove("restaurantId");
             editor.remove("currentTableId");
             editor.commit();
-            Log.e("TabbedMenu","Shared Preferences Check --- UserID : "+preferences.getString("userID", "")
-                    +"username : "+preferences.getString("username", "")
-                    +"restID : "+preferences.getString("restaurantId", "")
-                    +"tableId : "+preferences.getString("currentTableId", ""));
+            Log.e("TabbedMenu", "Shared Preferences Check --- UserID : " + preferences.getString("userID", "")
+                    + "username : " + preferences.getString("username", "")
+                    + "restID : " + preferences.getString("restaurantId", "")
+                    + "tableId : " + preferences.getString("currentTableId", ""));
             Details.REST_ID = "";
             Details.TABLE_ID = "";
             //onStart();
             startActivity(setupIntent);
             return true;
-        }
-        else if(id == R.id.action_offers){
+        } else if (id == R.id.action_offers) {
             Intent offerIntent = new Intent(TabbedMenu.this, OffersActivity.class);
             startActivity(offerIntent);
-        }
-        else if(id == R.id.action_signout){
+        }else if(id==R.id.action_credits) {
+            Intent offerIntent = new Intent(TabbedMenu.this, CreditsActivity.class);
+            startActivity(offerIntent);
+        } else if (id == R.id.action_signout) {
             Intent setupIntent = new Intent(TabbedMenu.this, LoginActivity.class);
             //setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             SharedPreferences.Editor editor = preferences.edit();
@@ -252,10 +283,10 @@ public class TabbedMenu extends AppCompatActivity {
             editor.remove("restaurantId");
             editor.remove("currentTableId");
             editor.commit();
-            Log.e("TabbedMenu","Shared Preferences Check --- UserID : "+preferences.getString("userID", "")
-                    +"username : "+preferences.getString("username", "")
-                    +"restID : "+preferences.getString("restaurantId", "")
-                    +"tableId : "+preferences.getString("currentTableId", ""));
+            Log.e("TabbedMenu", "Shared Preferences Check --- UserID : " + preferences.getString("userID", "")
+                    + "username : " + preferences.getString("username", "")
+                    + "restID : " + preferences.getString("restaurantId", "")
+                    + "tableId : " + preferences.getString("currentTableId", ""));
             Details.USER_ID = "";
             Details.USERNAME = "";
             //Log.e("TabbedMenu","mAuth : "+mAuth.getCurrentUser().getUid());
@@ -267,12 +298,15 @@ public class TabbedMenu extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Void> task) {
                             }
                         });
-            }catch (Exception e){
+            } catch (Exception e) {
 
             }
             //onStart();
             startActivity(setupIntent);
             return true;
+        }else if(id == R.id.action_prev_orders){
+            Intent offerIntent = new Intent(TabbedMenu.this, PreviousOrdersActivity.class);
+            startActivity(offerIntent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -316,14 +350,22 @@ public class TabbedMenu extends AppCompatActivity {
 //        Log.e("TabbedMenu","UID : "+mAuth.getCurrentUser().getUid());
         mAuth = FirebaseAuth.getInstance();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        Log.e("TabbedMenu","Shared Preferences Check --- UserID : "+preferences.getString("userID", "")
-                +"username : "+preferences.getString("username", "")
-                +"restID : "+preferences.getString("restaurantId", "")
-                +"tableId : "+preferences.getString("currentTableId", ""));
+        Log.e("TabbedMenu", "Shared Preferences Check --- UserID : " + preferences.getString("userID", "")
+                + "username : " + preferences.getString("username", "")
+                + "restID : " + preferences.getString("restaurantId", "")
+                + "tableId : " + preferences.getString("currentTableId", ""));
         final String restaurantId = preferences.getString("restaurantId", "");
-        final String currentTableId = preferences.getString("currentTableId","");
+        final String currentTableId = preferences.getString("currentTableId", "");
         String userID = preferences.getString("userID", "");
-        String username = preferences.getString("username","");
+        String username = preferences.getString("username", "");
+        try{
+            if(preferences.getString("confirmationActivity","").equalsIgnoreCase("true")){
+                Intent tomain = new Intent(TabbedMenu.this, ConfirmationActivity.class);
+                startActivity(tomain);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         /*Intent tomain = new Intent(TabbedMenu.this, QR_Offers_prevOrders.class);
         startActivity(tomain);*/
         mDatabaseUsersListener = new ValueEventListener() {
@@ -344,7 +386,7 @@ public class TabbedMenu extends AppCompatActivity {
                         //And the data of google sign-in is added at the time of setup in GoogleSetupActivity
                         Intent toSetup = new Intent(TabbedMenu.this, GoogleSetupAcitivty.class);
                         startActivity(toSetup);
-                    }else if(restaurantId.equals(null) || restaurantId.isEmpty() || currentTableId.equals(null) || currentTableId.isEmpty()) {
+                    } else if (restaurantId.equals(null) || restaurantId.isEmpty() || currentTableId.equals(null) || currentTableId.isEmpty()) {
                         Intent tomain = new Intent(TabbedMenu.this, QR_Offers_prevOrders.class);
                         startActivity(tomain);
                     }
@@ -357,26 +399,34 @@ public class TabbedMenu extends AppCompatActivity {
             }
         };
 
-        if(mAuth.getCurrentUser()==null){
+
+
+        if (mAuth.getCurrentUser() == null) {
             Intent tomain = new Intent(TabbedMenu.this, LoginActivity.class);
             tomain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(tomain);
-        }else {
+        } else {
             try {
                 mDatabaseUsers.addValueEventListener(mDatabaseUsersListener);
-            }
-            catch (Exception e){
-                Log.e("TabbedMenu","Error : " + e);
+            } catch (Exception e) {
+                Log.e("TabbedMenu", "Error : " + e);
             }
         }
         //TODO : Change this to query
 
-        Log.e("TabbedMenu","The details are : "+ restaurantId +" "+ currentTableId+ " " + userID+" " + username);
+        Log.e("TabbedMenu", "The details are : " + restaurantId + " " + currentTableId + " " + userID + " " + username);
 
 
         mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("categories");
         mMenuRef.addValueEventListener(mMenuRefListener);
         mRestRef.addValueEventListener(mRestRefListener);
+        if (Details.USER_ID != null && !preferences.getString("confirmationActivity","").equalsIgnoreCase("true")) {
+
+            mTableRef.child(Details.USER_ID).child("name").setValue(Details.USERNAME);
+            mTableRef.child(Details.USER_ID).child("confirmStatus").setValue("no");
+
+        }
+
     }
 
 
@@ -395,11 +445,17 @@ public class TabbedMenu extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        super.onResume();
+        super.onResume();/*
         mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table")
                 .child(Details.TABLE_ID).child("currentOrder").child("activeUsers").child(Details.USER_ID);
         mTableRef.child("name").setValue(Details.USERNAME);
-        mTableRef.child("confirmStatus").setValue("no");
+        mTableRef.child("confirmStatus").setValue("no");*/
+
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
         mMenuRef.addValueEventListener(mMenuRefListener);
         mRestRef.addValueEventListener(mRestRefListener);
     }
@@ -413,6 +469,62 @@ public class TabbedMenu extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
         }
         back_pressed = System.currentTimeMillis();
+    }
+
+    public boolean isConnected(Context context) {
+
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netinfo = cm.getActiveNetworkInfo();
+
+        if (netinfo != null && netinfo.isConnectedOrConnecting()) {
+            android.net.NetworkInfo wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            android.net.NetworkInfo mobile = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+            if((mobile != null && mobile.isConnectedOrConnecting()) || (wifi != null && wifi.isConnectedOrConnecting()))
+                return true;
+        else return false;
+        } else
+        return false;
+    }
+
+    private boolean internetConnectionAvailable(int timeOut) {
+        InetAddress inetAddress = null;
+        try {
+            Future<InetAddress> future = Executors.newSingleThreadExecutor().submit(new Callable<InetAddress>() {
+                @Override
+                public InetAddress call() {
+                    try {
+                        return InetAddress.getByName("google.com");
+                    } catch (UnknownHostException e) {
+                        return null;
+                    }
+                }
+            });
+            inetAddress = future.get(timeOut, TimeUnit.MILLISECONDS);
+            future.cancel(true);
+        } catch (InterruptedException e) {
+        } catch (ExecutionException e) {
+        } catch (TimeoutException e) {
+        }
+        return inetAddress!=null && !inetAddress.equals("");
+    }
+
+    public AlertDialog.Builder buildDialog(Context c) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(c);
+        builder.setTitle("No Internet Connection");
+        builder.setMessage("You need to have Mobile Data or wifi to access this. Press ok to Exit");
+
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                finish();
+            }
+        });
+
+        return builder;
     }
 
 }

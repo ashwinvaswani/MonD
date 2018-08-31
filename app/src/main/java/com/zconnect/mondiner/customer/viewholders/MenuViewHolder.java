@@ -22,6 +22,9 @@ import com.zconnect.mondiner.customer.R;
 import com.zconnect.mondiner.customer.models.Menu;
 import com.zconnect.mondiner.customer.utils.Details;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     private TextView itemNametv;
@@ -118,7 +121,6 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
                 mTableRef.child(dishId).child("price").setValue(menu.getItemPrice());
                 mTableRef.child(dishId).child("name").setValue(menu.getItemName());
                 mTableRef.child(dishId).child("users").child(Details.USER_ID).setValue(menu.getItemQuantity());
-
                 break;
             }
             case R.id.decrement_button: {

@@ -17,9 +17,6 @@ import com.zconnect.mondiner.customer.utils.Details;
 
 import java.util.ArrayList;
 
-/**
- * Created by Ishaan on 26-01-2018.
- */
 
 public class CartUserConfirmationViewholder extends RecyclerView.ViewHolder {
 

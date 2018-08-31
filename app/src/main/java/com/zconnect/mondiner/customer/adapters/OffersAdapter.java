@@ -16,6 +16,7 @@ import java.util.ArrayList;
  */
 
 public class OffersAdapter extends RecyclerView.Adapter<OffersViewholder>{
+
     private ArrayList<Offers> offers;
 
     public OffersAdapter(ArrayList<Offers> offers){

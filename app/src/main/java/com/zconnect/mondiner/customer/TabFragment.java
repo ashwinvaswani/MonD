@@ -82,7 +82,6 @@ public class TabFragment extends Fragment {
         indianMenu.setLayoutManager(new LinearLayoutManager(getContext()));
         noItemText.setText("No items to display for the cuisine : " + tabInfo.getCatName());
         Log.e("TabFragment", "" + Details.REST_ID + "current_cuisine : " + Details.Current_Cuisine);
-
         Log.e("TabFragment", "Cuisine id index " + Details.CUISINE_INDEX);
 
         //TODO : Change all hard coded stuff
@@ -154,6 +153,7 @@ public class TabFragment extends Fragment {
                 }
                 if (menus.size() != 0) {
                     noItemText.setVisibility(View.GONE);
+
                 }
                 menuAdapter.notifyDataSetChanged();
                 mTableRef.addValueEventListener(tableListener);

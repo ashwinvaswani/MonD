@@ -1,7 +1,10 @@
 package com.zconnect.mondiner.customer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.renderscript.Sampler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,6 +35,7 @@ public class ConfirmationActivity extends AppCompatActivity {
     private DatabaseReference mTableRef;
     private ValueEventListener mTableRefListener;
     private ValueEventListener confirmStatusListener;
+    private ValueEventListener mCurrentUsersListener;
     private DatabaseReference mDataRef;
     private CartAdapter cartAdapter;
     private ArrayList<DishOrdered> dishitems = new ArrayList<>();
@@ -46,6 +50,7 @@ public class ConfirmationActivity extends AppCompatActivity {
     private Button orderAdd;
     private LinearLayout amountLinear;
     private TextView yourOrder;
+    private SharedPreferences preferences;
     //private GifImageView gif;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,10 +144,12 @@ public class ConfirmationActivity extends AppCompatActivity {
 
                 }
             };
+            mDataRef.addValueEventListener(confirmStatusListener);
+
         }catch (Exception e){
 
         }
-        mDataRef.addValueEventListener(confirmStatusListener);
+
 
         callWaiter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,7 +164,10 @@ public class ConfirmationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent toMenu = new Intent(ConfirmationActivity.this, TabbedMenu.class);
-                toMenu.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("confirmationActivity","false");
+                editor.apply();
                 startActivity(toMenu);
             }
         });
@@ -166,9 +176,41 @@ public class ConfirmationActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+    try {
+        mCurrentUsersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChild(Details.USER_ID)) {
+                    Intent tomain = new Intent(ConfirmationActivity.this, QR_Offers_prevOrders.class);
+                    preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.remove("restaurantId");
+                    editor.remove("currentTableId");
+                    editor.putString("confirmationActivity", "false");
+                    Details.TABLE_ID = "";
+                    Details.REST_ID = "";
+                    editor.apply();
+                    startActivity(tomain);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        mTableRef.child("activeUsers").addValueEventListener(mCurrentUsersListener);
+    }catch (Exception e){
+        e.printStackTrace();
+    }
         cartContent.setVisibility(View.GONE);
         amountLinear.setVisibility(View.GONE);
         yourOrder.setVisibility(View.GONE);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("confirmationActivity", "true");
+        editor.apply();
     }
 
     @Override
@@ -181,6 +223,8 @@ public class ConfirmationActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
+        orderStatus.setText("Processing Order");
+        mTableRef.child("activeUsers").addValueEventListener(mCurrentUsersListener);
         mTableRef.child("cart").addValueEventListener(mTableRefListener);
         mDataRef.addValueEventListener(confirmStatusListener);
     }

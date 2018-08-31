@@ -154,6 +154,7 @@ public class EmailRegisterActivity extends AppCompatActivity {
                         final Map<String, Object> taskMap = new HashMap<String, Object>();
                         taskMap.put("Username", name);
                         taskMap.put("Email", email);
+
                         if(resultUri!=null) {
                             StorageReference filepath = mStorageImage.child(resultUri.getLastPathSegment());
                             filepath.putFile(resultUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {

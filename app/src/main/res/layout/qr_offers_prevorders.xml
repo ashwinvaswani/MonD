@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".QR_Offers_prevOrders"
     android:background="@color/background">
-
+t.AppBarLayout>
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"

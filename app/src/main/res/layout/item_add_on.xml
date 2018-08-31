@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="100dp"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/add_on_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:scaleType="centerCrop"
+        app:roundAsCircle="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/add_on_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="40"
+            android:text="ksdjsdf"
+            android:singleLine="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="#FFF"
+            android:textSize="18sp" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/add_on_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="40"
+            android:text="ksdjsdf"
+            android:singleLine="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="#FFF"
+            android:textSize="18sp" />
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <Button
+            android:id="@+id/add_on_decrement_button"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/round_button_layout_white"
+            android:text="-"
+            android:textColor="#FFF" />
+
+        <TextView
+            android:id="@+id/add_on_quantity_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="0"
+            android:textColor="#FFF" />
+
+        <Button
+            android:id="@+id/add_on_increment_button"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/round_button_layout_white"
+            android:text="+"
+            android:textColor="#FFF" />
+    </LinearLayout>
+</LinearLayout>

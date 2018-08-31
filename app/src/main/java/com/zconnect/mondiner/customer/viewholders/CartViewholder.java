@@ -23,7 +23,7 @@ import com.zconnect.mondiner.customer.utils.Details;
  * Created on 21-01-2018.
  */
 
-public class CartViewholder extends RecyclerView.ViewHolder {
+public class CartViewholder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     public TextView itemNametv;
     public TextView itemPricetv;
@@ -64,7 +64,7 @@ public class CartViewholder extends RecyclerView.ViewHolder {
         itemQuantitytv.setText(dishitems.getDishQuantity()+"");
         itemPricetv.setText(context.getResources().getString(R.string.Rs)+dishitems.getDishPrice());
         itemAmounttv.setText(context.getResources().getString(R.string.Rs)+dishitems.getDishAmount());
-
+        itemView.setOnClickListener(this);
     }
 
 
@@ -80,9 +80,14 @@ public class CartViewholder extends RecyclerView.ViewHolder {
                 ((Activity) itemView.getContext()).startActivity(intent);
             }
         });
-
-
     }
 
 
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(v.getContext(), DishQuantityDetails.class);
+        Log.e("CartViewholder", "" + dishOrdered.getDishID());
+        Details.DISH_ID = dishOrdered.getDishID();
+        v.getContext().startActivity(intent);
+    }
 }

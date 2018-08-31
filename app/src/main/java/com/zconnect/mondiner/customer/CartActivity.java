@@ -14,16 +14,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.zconnect.mondiner.customer.adapters.AddOnAdapter;
 import com.zconnect.mondiner.customer.adapters.CartAdapter;
+import com.zconnect.mondiner.customer.adapters.MenuAdapter;
 import com.zconnect.mondiner.customer.adapters.UserConfirmationAdapter;
 import com.zconnect.mondiner.customer.models.CartUserData;
 import com.zconnect.mondiner.customer.models.DishOrdered;
+import com.zconnect.mondiner.customer.models.Menu;
 import com.zconnect.mondiner.customer.utils.Details;
 
 import java.util.ArrayList;
@@ -34,15 +38,48 @@ public class CartActivity extends AppCompatActivity {
     private ValueEventListener mCurrentOrderCartListener;
     private ValueEventListener mCurrentOrderUsersListener;
     private ValueEventListener mAllUsersListener;
+    private ValueEventListener mMenuRefListener;
     private DatabaseReference mTableRef;
     private RecyclerView cartContent;
     private RecyclerView cartUserDatarv;
+    private RecyclerView addOnrv;
     private Button confirmOrder;
-    private DatabaseReference mDishRef;
+    private DatabaseReference mMenuRef;
     private CartAdapter cartAdapter;
+    private AddOnAdapter addOnAdapter;
     private UserConfirmationAdapter userConfirmationAdapter;
     private ArrayList<CartUserData> userData = new ArrayList<>();
     private ArrayList<DishOrdered> dishitems = new ArrayList<>();
+    private ArrayList<Menu> addOnItems = new ArrayList<>();
+    private ArrayList<String> dishIDs = new ArrayList<>();
+    private ValueEventListener tableListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            for (DataSnapshot dish : dataSnapshot.getChildren()) {
+                if (!(dish.child("users").hasChild(Details.USER_ID) && dishIDs.contains(dish.getKey()))) continue;
+                int i = dishIDs.indexOf(dish.getKey());
+                addOnItems.get(i).setItemQuantity(dish.child("users").child(Details.USER_ID).getValue(String.class));
+                String quantity = addOnItems.get(i).getItemQuantity();
+                int totalQuantity = 0;
+                totalQuantity = Integer.parseInt(quantity);
+                for(DataSnapshot user : dish.child("users").getChildren()) {
+                    if(!user.getKey().equals(Details.USER_ID)) {
+                        totalQuantity = totalQuantity+Integer.parseInt(user.getValue(String.class));
+                    }
+                    else{
+                        continue;
+                    }
+                }
+                mTableRef.child(dish.getKey()).child("quantity").setValue(totalQuantity + "");
+            }
+            addOnAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+        }
+    };
     private int dishAmount;
     private String dishPrice;
     private int dishQuantity;
@@ -52,12 +89,14 @@ public class CartActivity extends AppCompatActivity {
     private TextView noItemCart;
     private long size=0;
     private int counter=0;
+    private TextView noItemText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
         setTitle("Cart");
+        Fresco.initialize(this);
 
         android.support.v7.widget.Toolbar toolbar =  findViewById(R.id.cart_toolbar);
         setSupportActionBar(toolbar);
@@ -65,6 +104,7 @@ public class CartActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.center_text_title_bar);
 
+        noItemText = findViewById(R.id.no_item_add_on_text);
         cartContent = findViewById(R.id.cart_recyclerview);
         cartUserDatarv = findViewById(R.id.user_cart_status);
         cartUserDatarv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -81,6 +121,13 @@ public class CartActivity extends AppCompatActivity {
 
         cartAdapter = new CartAdapter(dishitems, getApplicationContext());
         cartContent.setAdapter(cartAdapter);
+
+        mMenuRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("menu").child("dishes");
+        mTableRef = FirebaseDatabase.getInstance().getReference().child("restaurants").child(Details.REST_ID).child("table").child(Details.TABLE_ID).child("currentOrder")/*.child("dishes")*/.child("cart");
+        addOnrv = findViewById(R.id.add_on_rv);
+        addOnrv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        addOnAdapter = new AddOnAdapter(addOnItems, dishIDs, getResources().getString(R.string.Rs), getApplicationContext());
+        addOnrv.setAdapter(addOnAdapter);
 
         dishAmount = 0;
         //TODO : Handle null exceptions from firebase
@@ -124,28 +171,6 @@ public class CartActivity extends AppCompatActivity {
         };
         mCurrentOrderRef.child("currentOrder").child("cart").addValueEventListener(mCurrentOrderCartListener);
 
-        /*mCurrentOrderRef.child("activeUsers").addValueEventListener(new ValueEventListener() {
-            @   Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot userID : dataSnapshot.getChildren()) {
-                    size = userID.getChildrenCount();
-                    if(userID.child("confirmStatus").getValue(String.class).equalsIgnoreCase("Yes")){
-                        counter++;
-                    }
-                }
-                Log.e("CartActivity"," -- size : "+size+"counter : "+counter);
-                if(counter==size){
-                    Intent setupIntent = new Intent(CartActivity.this, ConfirmationActivity.class);
-                    setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(setupIntent);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
         cartUserDatarv.setVisibility(View.GONE);
         confirmOrder.setVisibility(View.VISIBLE);
         mCurrentOrderUsersListener = new ValueEventListener() {
@@ -210,6 +235,55 @@ public class CartActivity extends AppCompatActivity {
 
         mCurrentOrderRef.child("currentOrder").child("activeUsers").addValueEventListener(mAllUsersListener);
 
+
+
+        mMenuRefListener = new ValueEventListener() {
+            @SuppressWarnings("ConstantConditions")
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                addOnItems.clear();
+                dishIDs.clear();
+                //TODO : Handle null pointer exception for price and type
+                for (final DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    try {
+                        if (childSnapshot.child("availability").getValue(String.class).equalsIgnoreCase("true") &&
+                                childSnapshot.hasChild("addOn") &&
+                                childSnapshot.child("addOn").getValue(String.class).equalsIgnoreCase("true")) {
+
+                            Log.e("CartActivity","in if of add on && name : "+childSnapshot.child("name").getValue(String.class));
+                            Menu m = new Menu();
+                            dishIDs.add(childSnapshot.getKey());
+                            m.setItemName(childSnapshot.child("name").getValue(String.class));
+                            m.setItemPrice(childSnapshot.child("price").getValue(String.class));
+                            m.setVegNonVeg(childSnapshot.child("type").getValue(String.class));
+                            m.setAvailability(true);
+                            if (childSnapshot.child("image").getValue(String.class) != null) {
+                                m.setImageUri(childSnapshot.child("image").getValue(String.class));
+                            } else {
+                                m.setImageUri("");
+                            }
+                            addOnItems.add(m);
+                        }
+                    }
+                    catch (Exception e) {
+                        Log.e("CartActivity", "Error : "+childSnapshot.child("name").getValue(String.class) + e);
+                    }
+                }
+                if (addOnItems.size() != 0) {
+                    noItemText.setVisibility(View.GONE);
+                    addOnrv.setVisibility(View.VISIBLE);
+                }
+                addOnAdapter.notifyDataSetChanged();
+                mTableRef.addValueEventListener(tableListener);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("TabFragment", "on cancelled" + databaseError.toString());
+            }
+        };
+        mMenuRef.addValueEventListener(mMenuRefListener);
+
     }
 
     @Override
@@ -218,7 +292,7 @@ public class CartActivity extends AppCompatActivity {
         mCurrentOrderRef.child("currentOrder").child("cart").removeEventListener(mCurrentOrderCartListener);
         mCurrentOrderRef.child("currentOrder").child("activeUsers").removeEventListener(mCurrentOrderUsersListener);
         mCurrentOrderRef.child("currentOrder").child("activeUsers").removeEventListener(mAllUsersListener);
-
+        mMenuRef.removeEventListener(mMenuRefListener);
     }
 
     @Override
@@ -227,6 +301,7 @@ public class CartActivity extends AppCompatActivity {
         mCurrentOrderRef.child("currentOrder").child("cart").addValueEventListener(mCurrentOrderCartListener);
         mCurrentOrderRef.child("currentOrder").child("activeUsers").addValueEventListener(mCurrentOrderUsersListener);
         mCurrentOrderRef.child("currentOrder").child("activeUsers").addValueEventListener(mAllUsersListener);
+        mMenuRef.addValueEventListener(mMenuRefListener);
     }
 }
 
