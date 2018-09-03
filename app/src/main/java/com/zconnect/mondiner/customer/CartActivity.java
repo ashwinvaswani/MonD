@@ -156,11 +156,13 @@ public class CartActivity extends AppCompatActivity {
                     final CartUserData cartUserData = new CartUserData();
                     cartUserData.setUserID(userID.getKey());
                     String userName = userID.child("name").getValue(String.class);
-                    String userNameParts[] = userName.trim().split(" ");
-                    cartUserData.setUserName(userNameParts[0]);
-                    cartUserData.setUserStatus(userID.child("confirmStatus").getValue(String.class));
-                    //userData.add(cartUserData);
-                    userData.add(cartUserData);
+                    if (userName != null) {
+                        String userNameParts[] = userName.trim().split(" ");
+                        cartUserData.setUserName(userNameParts[0]);
+                        cartUserData.setUserStatus(userID.child("confirmStatus").getValue(String.class));
+                        //userData.add(cartUserData);
+                        userData.add(cartUserData);
+                    }
 
                 }
                 userConfirmationAdapter.notifyDataSetChanged();
@@ -188,8 +190,10 @@ public class CartActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 int flag=0;
                 for(DataSnapshot user : dataSnapshot.getChildren()){
-                    if(user.child("confirmStatus").getValue(String.class).equalsIgnoreCase("no")){
-                        flag=1;
+                    if(user.child("confirmStatus").getValue(String.class) != null) {
+                        if (user.child("confirmStatus").getValue(String.class).equalsIgnoreCase("no")) {
+                            flag = 1;
+                        }
                     }
                 }
                 if(flag==0){

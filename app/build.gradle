@@ -41,6 +41,7 @@ dependencies {
     compile 'com.cepheuen.elegant-number-button:lib:1.0.2'
     compile 'de.hdodenhof:circleimageview:2.2.0'
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.10'
+    compile 'com.stripe:stripe-android:6.1.2'
 }
 apply plugin: 'com.google.gms.google-services'
 
