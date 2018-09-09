@@ -4,11 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/item_menu"
     android:background="@color/background"
     android:weightSum="1"
     android:padding="7dp"
     >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/item">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/dish_image"
@@ -77,6 +81,18 @@
         android:background="@drawable/round_button_layout_white"
         android:text="-"
         android:textColor="#FFF" />
+
+
+    </RelativeLayout>
+
+    <ListView
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/item"
+        tools:ignore="ExtraText">
+
+    </ListView>
 
 
 </RelativeLayout>
