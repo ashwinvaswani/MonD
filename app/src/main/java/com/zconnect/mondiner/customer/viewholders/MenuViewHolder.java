@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.zconnect.mondiner.customer.R;
+import com.zconnect.mondiner.customer.TabbedMenu;
 import com.zconnect.mondiner.customer.models.Menu;
 import com.zconnect.mondiner.customer.utils.Details;
 
@@ -36,6 +38,8 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     private final DatabaseReference mTableRef;
     private Menu menu;
     private String dishId;
+
+
 
     public MenuViewHolder(View itemView) {
         super(itemView);
@@ -55,6 +59,8 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
                 .child("currentOrder")
                 .child("cart");
                 //.child("dishes");
+
+
     }
 
     public void populate(final com.zconnect.mondiner.customer.models.Menu menu, final String dishId, final String rsSymbol, final Context context) {
@@ -107,6 +113,7 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     @Override
     public void onClick(View view) {
         int i=0;
+
         switch (view.getId()) {
             case R.id.increment_button: {
                 Log.e("MenuViewHolder" +

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/item_menu"
     android:background="@color/background"
     android:weightSum="1"
     android:padding="7dp"

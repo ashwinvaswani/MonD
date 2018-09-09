@@ -1,7 +1,12 @@
 package com.zconnect.mondiner.customer;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,11 +25,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.zconnect.mondiner.customer.adapters.CartAdapter;
 import com.zconnect.mondiner.customer.models.DishOrdered;
+import com.zconnect.mondiner.customer.receivers.NetworkStateChangeReceiver;
 import com.zconnect.mondiner.customer.utils.Details;
 
 import java.util.ArrayList;
 
 import pl.droidsonroids.gif.GifImageView;
+
 
 public class ConfirmationActivity extends AppCompatActivity {
 
@@ -51,6 +58,8 @@ public class ConfirmationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirmation);
+
+
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.cart_toolbar);
         setSupportActionBar(toolbar);
 
@@ -183,11 +192,13 @@ public class ConfirmationActivity extends AppCompatActivity {
         super.onRestart();
         mTableRef.child("cart").addValueEventListener(mTableRefListener);
         mDataRef.addValueEventListener(confirmStatusListener);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();/*
+
         cartContent.setVisibility(View.GONE);
         amountLinear.setVisibility(View.GONE);
         yourOrder.setVisibility(View.GONE);*/

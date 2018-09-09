@@ -5,6 +5,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/background"
+    android:id="@+id/activity_confirmation"
     tools:context="com.zconnect.mondiner.customer.ConfirmationActivity">
 
     <LinearLayout

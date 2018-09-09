@@ -2,12 +2,23 @@ package com.zconnect.mondiner.customer;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -16,6 +27,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.zconnect.mondiner.customer.receivers.NetworkStateChangeReceiver;
+
+import static com.zconnect.mondiner.customer.NetworkUtil.TYPE_NOT_CONNECTED;
+import static com.zconnect.mondiner.customer.NetworkUtil.getConnectivityStatusString;
+
+
+//import static com.zconnect.mondiner.customer.receivers.NetworkStateChangeReceiver.IS_NETWORK_AVAILABLE;
+
 
 
 public class UnusedMainActivity extends AppCompatActivity {
@@ -30,13 +49,73 @@ public class UnusedMainActivity extends AppCompatActivity {
 
     boolean status = false;
     private Button jj;
+    //public NetworkStateChangeReceiver mReceiver;
+    //Snackbar snackbar;
+    public static int TYPE_WIFI = 1;
+    public static int TYPE_MOBILE = 2;
+    public static int TYPE_NOT_CONNECTED = 0;
+    private Snackbar snackbar;
+    private CoordinatorLayout coordinatorLayout;
+    private boolean internetConnected=true;
 
+    // TRY start
+    private void registerInternetCheckReceiver() {
+        IntentFilter internetFilter = new IntentFilter();
+        internetFilter.addAction("android.net.wifi.STATE_CHANGE");
+        internetFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(broadcastReceiver, internetFilter);
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        registerInternetCheckReceiver();
+    }
+//TRY end
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(broadcastReceiver);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+/*
+        mReceiver = new NetworkStateChangeReceiver () {
+            @Override
+            protected void onNetworkChange() {
+                snackbar = Snackbar.make(findViewById(R.id.main_content), "Please check your internet connection and try again", Snackbar.LENGTH_SHORT);
+                snackbar.show();
+            }
+        };
 
+*/
+
+
+
+
+        //Snackbar.make(findViewById(R.id.main_content),"Network Status: " + status, Snackbar.LENGTH_LONG).show();
+
+        /*
+        IntentFilter intentFilter = new IntentFilter(NetworkStateChangeReceiver.NETWORK_AVAILABLE_ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                boolean isNetworkAvailable = intent.getBooleanExtra(IS_NETWORK_AVAILABLE, false);
+                String networkStatus = isNetworkAvailable ? "connected" : "disconnected";
+                if(networkStatus == "connected"){
+                    Toast.makeText(getContext(), "Clear TOp", Toast.LENGTH_SHORT).show();
+
+
+                }
+                Snackbar.make(v, "Network Status: " + networkStatus, Snackbar.LENGTH_LONG).show();
+            }
+        }, intentFilter);
+*/
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         qrScan = new IntentIntegrator(this);
@@ -86,6 +165,9 @@ public class UnusedMainActivity extends AppCompatActivity {
         checkUserExist();
         //qrScan.initiateScan();
     }
+
+
+
     private void checkUserExist() {
         if(mAuth.getCurrentUser() != null) {
             final String user_id = mAuth.getCurrentUser().getUid();
@@ -119,7 +201,81 @@ public class UnusedMainActivity extends AppCompatActivity {
         bottom_nav.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(bottom_nav);
     }
+
+
+    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String status = getConnectivityStatusString(context);
+            setSnackbarMessage(status,false);
+        }
+    };
+
+    public static int getConnectivityStatus(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (null != activeNetwork) {
+            if(activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)
+                return TYPE_WIFI;
+
+            if(activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE)
+                return TYPE_MOBILE;
+        }
+        return TYPE_NOT_CONNECTED;
+    }
+
+    public static String getConnectivityStatusString(Context context) {
+        int conn = getConnectivityStatus(context);
+        String status = null;
+        if (conn == TYPE_WIFI) {
+            status = "Wifi enabled";
+        } else if (conn == TYPE_MOBILE) {
+            status = "Mobile data enabled";
+        } else if (conn == TYPE_NOT_CONNECTED) {
+            status = "Not connected to Internet";
+        }
+        return status;
+    }
+    private void setSnackbarMessage(String status,boolean showBar){
+        String internetStatus = "";
+        if (status.equalsIgnoreCase("Wifi enabled") || status.equalsIgnoreCase("Mobile data enabled")) {
+            internetStatus = "Internet Connected";
+        } else {
+            internetStatus = "Lost Internet Connection";
+        }
+        snackbar = Snackbar
+                .make(findViewById(R.id.main_content), internetStatus, Snackbar.LENGTH_LONG)
+                .setAction("X", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        snackbar.dismiss();
+                    }
+                });
+        // Changing message text color
+        snackbar.setActionTextColor(Color.WHITE);
+        // Changing action button text color
+        View sbView = snackbar.getView();
+        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(Color.WHITE);
+        if (internetStatus.equalsIgnoreCase("Lost Internet Connection")) {
+            if (internetConnected) {
+                snackbar.show();
+                internetConnected = false;
+            }
+        } else {
+            if (!internetConnected) {
+                internetConnected = true;
+                snackbar.show();
+            }
+        }
+
+    }
+
+
 }
+
+
 
 
 

@@ -77,6 +77,7 @@ public class TabFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.tab_fragment, container, false);
+
         indianMenu = rootView.findViewById(R.id.indian_menu_rv);
         noItemText = rootView.findViewById(R.id.no_item_text);
         indianMenu.setLayoutManager(new LinearLayoutManager(getContext()));

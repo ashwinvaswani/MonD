@@ -1,13 +1,28 @@
 package com.zconnect.mondiner.customer;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.zconnect.mondiner.customer.adapters.PrevOrdersAdapter;
+import com.zconnect.mondiner.customer.models.PrevOrders;
+import com.zconnect.mondiner.customer.utils.Details;
+
+import java.util.ArrayList;
 
 
 /**
@@ -21,6 +36,14 @@ import android.widget.Toast;
 public class PrevOrdersFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
+    private RecyclerView previousOrderRv;
+    private TextView noItemtext;
+    private ArrayList<PrevOrders> prevOrders = new ArrayList<>();
+    private PrevOrdersAdapter prevOrdersAdapter;
+    private DatabaseReference mOrderRef;
+    private ValueEventListener mOrderListener;
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -65,7 +88,42 @@ public class PrevOrdersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_prev_orders, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_prev_orders, container, false);
+        previousOrderRv = rootView.findViewById(R.id.fragment_previous_orders_rv);
+        noItemtext = rootView.findViewById(R.id.fragment_prev_orders_noItemText);
+        mOrderRef = FirebaseDatabase.getInstance().getReference().child("Users").child(Details.USER_ID).child("orderHistory");
+        previousOrderRv.setLayoutManager(new LinearLayoutManager(getContext()));
+        prevOrdersAdapter = new PrevOrdersAdapter(prevOrders, getResources().getString(R.string.Rs), getContext());
+        previousOrderRv.setAdapter(prevOrdersAdapter);
+        try {
+            mOrderListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot orders : dataSnapshot.getChildren()) {
+                        PrevOrders prevOrder = new PrevOrders();
+                        prevOrder.setOrderId(orders.getKey());
+                        prevOrder.setDate(orders.child("date").getValue(String.class));
+                        prevOrder.setRestaurantName(orders.child("restaurantID").getValue(String.class));
+                        prevOrder.setTotalAmount(orders.child("total").getValue(Long.class).toString());
+                        prevOrders.add(prevOrder);
+                    }
+
+                    prevOrdersAdapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+
+            mOrderRef.addValueEventListener(mOrderListener);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return rootView;
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event

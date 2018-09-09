@@ -1,8 +1,13 @@
 package com.zconnect.mondiner.customer;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.renderscript.Sampler;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,9 +29,11 @@ import com.zconnect.mondiner.customer.adapters.CartAdapter;
 import com.zconnect.mondiner.customer.adapters.UserConfirmationAdapter;
 import com.zconnect.mondiner.customer.models.CartUserData;
 import com.zconnect.mondiner.customer.models.DishOrdered;
+import com.zconnect.mondiner.customer.receivers.NetworkStateChangeReceiver;
 import com.zconnect.mondiner.customer.utils.Details;
 
 import java.util.ArrayList;
+
 
 public class CartActivity extends AppCompatActivity {
 
@@ -57,6 +64,8 @@ public class CartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
+
+
         setTitle("Cart");
 
         android.support.v7.widget.Toolbar toolbar =  findViewById(R.id.cart_toolbar);

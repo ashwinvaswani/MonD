@@ -1,6 +1,12 @@
 package com.zconnect.mondiner.customer;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,9 +19,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.zconnect.mondiner.customer.adapters.DishQuantityDetailsAdapter;
 import com.zconnect.mondiner.customer.models.CartUserData;
+import com.zconnect.mondiner.customer.receivers.NetworkStateChangeReceiver;
 import com.zconnect.mondiner.customer.utils.Details;
 
 import java.util.ArrayList;
+
 
 public class DishQuantityDetails extends AppCompatActivity {
 
@@ -29,6 +37,8 @@ public class DishQuantityDetails extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_details_for_item);
+
+
         userQuantityrv = findViewById(R.id.user_details_rv);
         userQuantityrv.setLayoutManager(new LinearLayoutManager(this));
         dishQuantityDetailsAdapter = new DishQuantityDetailsAdapter(userData);

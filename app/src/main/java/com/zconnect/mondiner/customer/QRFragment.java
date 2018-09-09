@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -187,7 +188,8 @@ public class QRFragment extends Fragment implements ZXingScannerView.ResultHandl
     }
 
     private void checkTableID(DataSnapshot childSnapShot, String tableID, String restID) {
-        Toast.makeText(getContext(), "Clear TOp", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(), "Clear TOp", Toast.LENGTH_SHORT).show();
+
         for (DataSnapshot grandChildSnapShot : childSnapShot.child("table").getChildren()) {
             if (grandChildSnapShot.getKey().equals(tableID)) {
                 preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
